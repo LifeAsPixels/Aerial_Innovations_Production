@@ -13,7 +13,7 @@ Script Function	---
 	#SingleInstance force ; Forces a single instance when trying to reopen script
 	#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
-	#Include Z:\Shawn\AHK\Library_Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
+	#Include Z:\Shawn\AI_AHK\Library_Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -51,16 +51,16 @@ InitializeVariables()
 	GroupAdd, EmailClient, New Mail
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
-	;~ Archives := "Z:\Shawn\AHK\Testing\Archives"
+	;~ Archives := "Z:\Shawn\AI_AHK\Testing\Archives"
 	Archives := "Z:\Archives 2015"
 	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 	Email := "https://email.1and1.com/appsuite/"
 	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
-	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AHK"]
+	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AI_AHK"]
 	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
 	ShawnBackups := "Z:\Shawn\Backups\"
 	BackupFilePattern := "\*.jpg"
-	;~ actHDDdir := ["C:\Temp\", "Z:\Shawn\AHK\Resources\JPG\"]
+	;~ actHDDdir := ["C:\Temp\", "Z:\Shawn\AI_AHK\Resources\JPG\"]
 	;~ actHDDfile := "deleteMe.jpg"
 	NASRecycle := "Z:\Shawn\Backups\Recycle\"
 	DesktopTemp := "C:\Users\WS2\Desktop\Temp\"

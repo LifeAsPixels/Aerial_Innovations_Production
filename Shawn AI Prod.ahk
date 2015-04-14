@@ -289,6 +289,7 @@ BackupAppdata:
 			continue
 		FileCopyDir, %A_Appdata%%value%, %ShawnBackups%%BackupDate%%value%, 1
 	}
+	
 	SetTimer, Backups, 86400000
 	return
 ;~ HDDActivate:
