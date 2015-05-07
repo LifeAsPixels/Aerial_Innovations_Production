@@ -43,9 +43,10 @@ InitializeVariables()
 	regexOrigFilename := "i)^(_MG_?|DSC_?|.+\d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
 	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
-	regexDateDigitA := "^20(\d{6})$"
-	regexDateDigitB := "^(\d{6})$"
+	regexDate8Digit := "^20(\d{6})$"
+	regexDate6Digit := "^(\d{6})$"
 	regexDir := "^(.+\\)(.+?)\\?$"
+	
 	GroupAdd, Photoshop, ahk_class Photoshop
 	GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
 	GroupAdd, EmailClient, New Mail
@@ -195,11 +196,11 @@ FlightDateInput:
 	If WinName =
 		WinGetActiveTitle, WinName
 	InputBox, FlightDateRaw, Input Flight Date, Input date using format YYMMDD, , 320, 240
-	If (RegExMatch(FlightDateRaw, regexDateDigitA) = 1 or RegExMatch(FlightDateRaw, regexDateDigitB) = 1)
+	If (RegExMatch(FlightDateRaw, regexDate8Digit) = 1 or RegExMatch(FlightDateRaw, regexDate6Digit) = 1)
 	{
-		If RegExMatch(FlightDateRaw, regexDateDigitA) = 1
-			YYMMDD := Regexreplace(FlightDateRaw, regexDateDigitA, "$1")
-		If RegExMatch(FlightDateRaw, regexDateDigitB) = 1
+		If RegExMatch(FlightDateRaw, regexDate8Digit) = 1
+			YYMMDD := Regexreplace(FlightDateRaw, regexDate8Digit, "$1")
+		If RegExMatch(FlightDateRaw, regexDate6Digit) = 1
 			YYMMDD := FlightDateRaw
 		YYYYMMDD := "20" . YYMMDD
 	}
@@ -226,10 +227,6 @@ FlightDateInput:
 			Standard format: %MMMM% %DD%, %YYYY%
 			Titleblock: %MMM% %DD% %YYYY%
 			Folder Tree: %YYMMDD%
-			
-			FlightDir
-			TBdate
-			LongDate
 		)
 		IfMsgBox TryAgain
 			GoSub FlightDateInput
@@ -289,9 +286,19 @@ BackupAppdata:
 			continue
 		FileCopyDir, %A_Appdata%%value%, %ShawnBackups%%BackupDate%%value%, 1
 	}
-	
+	; Delete all folders in the backups folder dated older than 31 days
+	CurrentTime := 
+	EnvAdd, CurrentTime,  -31, days
+	FormatTime, CurrentTime, %CurrentTime%, yyMMdd
+	Loop, %ShawnBackups%*, 2, 0
+	{
+		If (A_LoopFileName < CurrentTime and RegExMatch(A_LoopFileName, regexDate6Digit))
+			FileRemoveDir, %A_LoopFileLongPath%, 1
+	}
+	; schedule "BackupAppdata" to run again tomorrow at the same time
 	SetTimer, Backups, 86400000
 	return
+
 ;~ HDDActivate:
 	;~ actHDDdirRev := []
 	;~ for i, value in actHDDdir
