@@ -40,7 +40,8 @@ InitializeVariables()
 {
 	global
 	InitializeVariables ++
-	regexOrigFilename := "i)^(_MG_?|DSC_?|.+\d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)$"
+	regexOrigFilename := 				   "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(\d+{1,5})(.+\.[\w]{1,4})(.+)$"
+	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d+{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
 	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
 	regexDate8Digit := "^20(\d{6})$"
@@ -227,10 +228,6 @@ FlightDateInput:
 			Standard format: %MMMM% %DD%, %YYYY%
 			Titleblock: %MMM% %DD% %YYYY%
 			Folder Tree: %YYMMDD%
-			
-			FlightDir
-			TBdate
-			LongDate
 		)
 		IfMsgBox TryAgain
 			GoSub FlightDateInput
@@ -290,25 +287,17 @@ BackupAppdata:
 			continue
 		FileCopyDir, %A_Appdata%%value%, %ShawnBackups%%BackupDate%%value%, 1
 	}
-	
-	
-	
-	SetTimer, Backups, 86400000
-	return
-
-^!+F12:: ; test run checking backup folder names
+	; Delete all folders in the backups folder dated older than 31 days
 	CurrentTime := 
 	EnvAdd, CurrentTime,  -31, days
 	FormatTime, CurrentTime, %CurrentTime%, yyMMdd
-	MsgBox,,, Deleting everything before %CurrentTime%
 	Loop, %ShawnBackups%*, 2, 0
 	{
 		If (A_LoopFileName < CurrentTime and RegExMatch(A_LoopFileName, regexDate6Digit))
-		{
-			MsgBox,,, removing %A_LoopFileName%
 			FileRemoveDir, %A_LoopFileLongPath%, 1
-		}
 	}
+	; schedule "BackupAppdata" to run again tomorrow at the same time
+	SetTimer, Backups, 86400000
 	return
 
 ;~ HDDActivate:
@@ -361,8 +350,8 @@ $!n:: ;New large Main Browser Window resets workspace
 	WinRestore, A
 	SetTitleMatchMode 3
 	WinGetActiveTitle, PsWinTitle
-	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4")
-	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3")
+	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7")
+	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$6")
 	Send {F2}
 	GoSub WaitXL
 	SetTitleMatchMode Fast

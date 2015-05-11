@@ -3,7 +3,6 @@ AutoHotkey Version	---	1.1.xx.xx
 Language	---	English
 Platform	---	Win9x/NT
 Author	---	Shawn Nix	<shawn@shawnnixphotography.com>
-
 Script Function	---
 	This script allows for faster photo production at Aerial Innovations of GA.
 */
