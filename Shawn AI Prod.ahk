@@ -78,16 +78,16 @@ ArrayPrint(ArrayVar)
 	MsgBox,,Simple loop using "A_Index", % "Item: " A_Index " has the Value of: " ArrayVar[A_Index]
 	return
 }
-PsBatch(Set,Action)
+PsBatch(SetNumber,ActionNumber)
 {
 	WinWaitActive ahk_class PSFloatC
 	If BrBatch = 0
 		GoSub BlockAllInput
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
-	Send {Down %Set%}
+	Send {Down %SetNumber%}
 	Send {Tab}
-	Send {Down %Action%}
+	Send {Down %ActionNumber%}
 	Send {Enter}
 	Defaults()
 	Return
@@ -365,6 +365,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	;~ GoSub WaitS
 	Send +{F2}
 	GoSub WaitS
+	GoSub WaitXS
 	Send ^t
 	Send ^0
 	Defaults(True)
@@ -383,7 +384,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	Return
 ^+F8:: ; Flatten and Save over
 	Send ^b
-	PsBatch(1, 0)
+	PsBatch(2, 0)
 	Return
 ~$^!w:: ; Auto close all Photoshop windows
 	WinWaitActive ahk_class #32770

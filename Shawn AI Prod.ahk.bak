@@ -365,6 +365,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	;~ GoSub WaitS
 	Send +{F2}
 	GoSub WaitS
+	GoSub WaitXS
 	Send ^t
 	Send ^0
 	Defaults(True)
