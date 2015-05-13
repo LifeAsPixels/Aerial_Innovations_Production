@@ -18,8 +18,11 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Defaults(MouseReset=False) ;This sub sets default environment settings
-{
+Defaults(MouseReset=False) { ; Creates and resets default variables for frequently changed variables
+	/*
+	This function sets default variables that are commonly used with assumed values
+	Passing True through this function will snap the mouse back to a stored location
+	*/
 	global
 	CoordMode, Mouse, Screen
 	MouseX := 0
@@ -33,13 +36,13 @@ Defaults(MouseReset=False) ;This sub sets default environment settings
 	DetectHiddenWindows, Off
 	If MouseReset
 		MouseMove, %MouseX%, %MouseY%, 0
-	return
 }
-InitializeVariables()
-{
-	global
+InitializeVariables() { ; Create mostly-static global variables
+	global ; create all these variables with global scope
 	InitializeVariables ++
-	regexOrigFilename := 				   "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(\d{1,5})(.+\.[\w]{1,4})(.+)$"
+	
+	; Regex patterns
+	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
 	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
@@ -47,53 +50,65 @@ InitializeVariables()
 	regexDate6Digit := "^(\d{6})$"
 	regexDir := "^(.+\\)(.+?)\\?$"
 	
+	; Files
+	thisScript := "Z:\Shawn\AI_AHK\Shawn AI Prod.ahk"
+	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
+	
+	; File Patterns
+	BackupFilePattern := "\*.jpg"
+	
+	; Folders
+	folderArchives := "Z:\folderArchives 2015"
+	folderShawnBackups := "Z:\Shawn\Backups\"
+	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
+	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
+	folderTitleBlocks := "Z:\_Titleblock Templates (1)\"
+	
+	; Webpages
+	Email := "https://email.1and1.com/appsuite/"
+	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
+
+	; Arrays
+	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AI_AHK"]
+	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
+	
+	; Window groups
 	GroupAdd, Photoshop, ahk_class Photoshop
 	GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
 	GroupAdd, EmailClient, New Mail
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
-	;~ Archives := "Z:\Shawn\AI_AHK\Testing\Archives"
-	Archives := "Z:\Archives 2015"
-	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
-	Email := "https://email.1and1.com/appsuite/"
-	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
-	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AI_AHK"]
-	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
-	ShawnBackups := "Z:\Shawn\Backups\"
-	BackupFilePattern := "\*.jpg"
-	;~ actHDDdir := ["C:\Temp\", "Z:\Shawn\AI_AHK\Resources\JPG\"]
-	;~ actHDDfile := "deleteMe.jpg"
-	NASRecycle := "Z:\Shawn\Backups\Recycle\"
-	DesktopTemp := "C:\Users\WS2\Desktop\Temp\"
-	;~ gosub HDDActivate
+	
+	; Run functions & schedule timed events
 	gosub Backups
-	;~ SetTimer, Backups, 3600000
-	;~ SetTimer, HDDActivate, 270000
+	titleblockFolderGroup()
 	Defaults()
-	return
 }
-ArrayPrint(ArrayVar)
-{
+titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
+	global
+	GroupAdd, groupTB, "_Titleblock Templates (1)"
+	Loop, %folderTitleBlocks%*, 2, 0 
+	{
+		GroupAdd, groupTB, %A_LoopFileName%
+	}
+}
+ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for debugging
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
 	MsgBox,,Simple loop using "A_Index", % "Item: " A_Index " has the Value of: " ArrayVar[A_Index]
-	return
 }
-PsBatch(Set,Action)
-{
+PsBatch(SetNumber,ActionNumber){ ; Automatically Navigate the Photoshop Batch processes GUI
 	WinWaitActive ahk_class PSFloatC
 	If BrBatch = 0
 		GoSub BlockAllInput
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
-	Send {Down %Set%}
+	Send {Down %SetNumber%}
 	Send {Tab}
-	Send {Down %Action%}
+	Send {Down %ActionNumber%}
 	Send {Enter}
 	Defaults()
-	Return
 }
-PsSaveAs(PsDirectory,PsWindowAttribute)
-{
+PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop SaveAs GUI
 	global
 	GoSub FlightDateValidate
 	SendInput ^+s
@@ -145,10 +160,8 @@ PsSaveAs(PsDirectory,PsWindowAttribute)
 	}
 	SendEvent ^{Tab}
 	Defaults()
-	Return
 }
-RunProgram(WinTitle, File, Path)
-{
+RunProgram(WinTitle, File, Path) { ; Run a program only if it isn't already running
 	SetTitleMatchMode, 2 ; approximate match
 	IfWinExist, %WinTitle%
 		WinActivate, %WinTitle%
@@ -157,18 +170,14 @@ RunProgram(WinTitle, File, Path)
 		Run, %File%, %Path%
 		WinWaitActive, %WinTitle%
 	}
-	return
 }
-Wait(Seconds)
-{
+Wait(Seconds) { ;creating a new syntax for pausing in AHK
 	Seconds := Seconds*1000
 	If Seconds <= 0
 		return
 	Sleep %Seconds%
-	Return
 }
-MoveFilesAndFolders(SourcePattern, DestinationFolder, DoOverwrite = false)
-{
+MoveFilesAndFolders(SourcePattern, DestinationFolder, DoOverwrite = false) { ;currently unused
 	
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -282,15 +291,15 @@ BackupAppdata:
 	FormatTime, BackupDate, ,yyyyMMdd
 	For i, value in AppDataBackups
 	{
-		IfExist, %ShawnBackups%%BackupDate%%value%
+		IfExist, %folderShawnBackups%%BackupDate%%value%
 			continue
-		FileCopyDir, %A_Appdata%%value%, %ShawnBackups%%BackupDate%%value%, 1
+		FileCopyDir, %A_Appdata%%value%, %folderShawnBackups%%BackupDate%%value%, 1
 	}
 	; Delete all folders in the backups folder dated older than 31 days
 	CurrentTime := 
 	EnvAdd, CurrentTime,  -31, days
 	FormatTime, CurrentTime, %CurrentTime%, yyMMdd
-	Loop, %ShawnBackups%*, 2, 0
+	Loop, %folderShawnBackups%*, 2, 0
 	{
 		If (A_LoopFileName < CurrentTime and RegExMatch(A_LoopFileName, regexDate6Digit))
 			FileRemoveDir, %A_LoopFileLongPath%, 1
@@ -298,14 +307,6 @@ BackupAppdata:
 	; schedule "BackupAppdata" to run again tomorrow at the same time
 	SetTimer, Backups, 86400000
 	return
-
-;~ HDDActivate:
-	;~ actHDDdirRev := []
-	;~ for i, value in actHDDdir
-		;~ actHDDdirRev.Insert(1, value)
-	;~ for i, value in actHDDdir
-		;~ FileCopy, %value%%actHDDfile%  actHDDdirRev[i], 1
-	;~ return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		The following section is used for Bridge keyboard shortcuts.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -333,6 +334,7 @@ BackupAppdata:
 !p:: ;Basic action to edit in Photoshop
 	GoSub BrBatch
 	PsBatch(0, 0)
+	WinActivate, ahk_class CabinetWClass ahk_group groupTB
 	Return
 $^n:: ;New small Basic window resets workspace
 	Send ^n^{F2}!ww{Enter}
@@ -356,7 +358,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	gosub BlockAllInput
-	Send !w2
+	Send !w1
 	Send ^+{tab}
 	Defaults()
 	Return
@@ -384,7 +386,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	Return
 ^+F8:: ; Flatten and Save over
 	Send ^b
-	PsBatch(1, 0)
+	PsBatch(2, 0)
 	Return
 ~$^!w:: ; Auto close all Photoshop windows
 	WinWaitActive ahk_class #32770
@@ -425,6 +427,7 @@ $!n:: ;New large Main Browser Window resets workspace
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #IfWinActive
 ^`:: ; Close AHK script
+	Run, %thisScript%
 	ExitApp
 ^+`::
 	Defaults()
@@ -482,13 +485,6 @@ $!n:: ;New large Main Browser Window resets workspace
 	GoSub FlightDateInput
 	Return
 ^NumpadSub:: ; List Variables
-	; Save the entire clipboard to a variable of your choice.
-	;~ ClipSaved := ClipboardAll 
-	;~ Send ^c
-	;~ PSfilename := Clipboard
-	; Restore the original clipboard. Note the use of Clipboard (not ClipboardAll).
-	;~ Clipboard := ClipSaved 
-	;~ ClipSaved =
 	WinGetActiveTitle, PsWinTitleTB
 	TBReplaceCount :=
 	TBFilenamePrefix := RegExReplace(PsWinTitleTB, regexPStabTB,"$1",TBReplaceCount)
@@ -497,40 +493,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	ArrayPrint(ProdExplorer)
 	ListVars
 	Return
-/*!NumpadAdd:: ; Automatically change MS Word settings to default printer tray
-	InputBox, LoopCount, Loop Count, Input number of files to open, ,320, 240
-	GoSub BlockAllInput
-	While LoopCount > 0
-	{
-		GoSub WaitS
-		Send {Enter}
-		SetTitleMatchMode, 2
-		SetTitleMatchMode, Slow
-		WinWaitActive, , MSO Generic Control Container
-		GoSub WaitS
-		Send ^{End}!psp
-		WinWaitActive, Page Setup
-		Send {Tab 3}{Up 5}{Tab}{Up 5}{Enter}
-		GoSub WaitS
-		IfWinActive, ahk_class #32770
-		{
-			Send !i
-			GoSub WaitS
-		}
-		Send ^w
-		WinWaitActive, ahk_class NUIDialog
-		Send !s
-		SetTitleMatchMode, 3
-		WinWaitActive, Microsoft Word non-commercial use
-		SetTitleMatchMode, 1
-		SetTitleMatchMode, Fast
-		WinActivate, type Microsoft Word Document
-		Send {Down}
-		LoopCount := --LoopCount
-	}
-	Defaults()
-	Return
-*/
+
 ^NumpadMult:: ; Automatically Move .jpg files to archive folder
 	Loop, 
 	if A_LoopFileAttrib contains N
@@ -600,7 +563,7 @@ $!n:: ;New large Main Browser Window resets workspace
 			Filelist = %Filelist%%A_LoopFileLongPath%`n
 		Loop, Parse, Filelist,`n 
 		{
-			FileMove, %A_LoopField%, %Archives%, 1
+			FileMove, %A_LoopField%, %folderArchives%, 1
 			If ErrorLevel 
 			{
 				MsgBox Could not move %A_LoopField% into %DestinationFolder%.
@@ -612,7 +575,7 @@ $!n:: ;New large Main Browser Window resets workspace
 		else
 		{
 			RootDir := Regexreplace(FolderPath[A_Index], regexDir, "$2")
-			FileMoveDir, % FolderPath[A_Index], %NASRecycle%%CurrentTime%%RootDir%, 1
+			FileMoveDir, % FolderPath[A_Index], %folderNASRecycle%%CurrentTime%%RootDir%, 1
 		}
 	}
 	MsgBox,,, Backup Complete
