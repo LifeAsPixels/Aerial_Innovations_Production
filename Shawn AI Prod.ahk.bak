@@ -34,11 +34,14 @@ Defaults(MouseReset=False) { ; Creates and resets default variables for frequent
 	BlockInput, Off
 	BlockInput, MouseMoveOff
 	DetectHiddenWindows, Off
-	If MouseReset
+	If MouseReset {
 		MouseMove, %MouseX%, %MouseY%, 0
+		CoordMode, Mouse, Window
+	}
 }
 InitializeVariables() { ; Create mostly-static global variables
 	global ; create all these variables with global scope
+	gosub BlockAllInput
 	InitializeVariables ++
 	
 	; Regex patterns
@@ -55,7 +58,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 	
 	; File Patterns
-	BackupFilePattern := "\*.jpg"
+	BackupFilePattern := "\*.*"
 	
 	; Folders
 	folderArchives := "Z:\folderArchives 2015"
@@ -82,15 +85,13 @@ InitializeVariables() { ; Create mostly-static global variables
 	; Run functions & schedule timed events
 	gosub Backups
 	titleblockFolderGroup()
-	Defaults()
+	Defaults(True)
 }
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
 	global
 	GroupAdd, groupTB, "_Titleblock Templates (1)"
 	Loop, %folderTitleBlocks%*, 2, 0 
-	{
 		GroupAdd, groupTB, %A_LoopFileName%
-	}
 }
 ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for debugging
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
@@ -188,6 +189,7 @@ BlockAllInput:
 	{
 		BlockInput, On
 		BlockInput, MouseMove
+		CoordMode, Mouse, Screen
 		MouseGetPos, MouseX, MouseY
 		MouseMove, 10000, 510
 	}
