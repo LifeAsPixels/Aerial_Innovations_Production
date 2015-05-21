@@ -1,4 +1,4 @@
-/*
+ /*
 AutoHotkey Version	---	1.1.xx.xx
 Language	---	English
 Platform	---	Win9x/NT
@@ -18,15 +18,14 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Defaults(MouseReset=False) { ; Creates and resets default variables for frequently changed variables
+Defaults(MouseReset = False) { ; Creates and resets default variables for frequently changed variables
 	/*
 	This function sets default variables that are commonly used with assumed values
 	Passing True through this function will snap the mouse back to a stored location
 	*/
 	global
 	CoordMode, Mouse, Screen
-	MouseX := 0
-	MouseY := 0
+	
 	BrBatchRun := 0
 	SendMode Event
 	SetTitleMatchMode 1
@@ -61,7 +60,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	BackupFilePattern := "\*.*"
 	
 	; Folders
-	folderArchives := "Z:\folderArchives 2015"
+	folderArchives := "Z:\Archives 2015"
 	folderShawnBackups := "Z:\Shawn\Backups\"
 	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
 	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
@@ -566,9 +565,9 @@ $!n:: ;New large Main Browser Window resets workspace
 		Loop, Parse, Filelist,`n 
 		{
 			FileMove, %A_LoopField%, %folderArchives%, 1
-			If ErrorLevel 
+			If ErrorLevel != 0 
 			{
-				MsgBox Could not move %A_LoopField% into %DestinationFolder%.
+				MsgBox,,, Could not move %A_LoopField% into %DestinationFolder%. `n ErrorLevel is %ErrorLevel%
 				LogInput := %LogInput%%A_LoopField%`n
 			}
 		}

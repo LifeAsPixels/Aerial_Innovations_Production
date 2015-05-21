@@ -1,4 +1,4 @@
-/*
+ /*
 AutoHotkey Version	---	1.1.xx.xx
 Language	---	English
 Platform	---	Win9x/NT
@@ -18,15 +18,14 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Defaults(MouseReset=False) { ; Creates and resets default variables for frequently changed variables
+Defaults(MouseReset = False) { ; Creates and resets default variables for frequently changed variables
 	/*
 	This function sets default variables that are commonly used with assumed values
 	Passing True through this function will snap the mouse back to a stored location
 	*/
 	global
 	CoordMode, Mouse, Screen
-	MouseX := 0
-	MouseY := 0
+	
 	BrBatchRun := 0
 	SendMode Event
 	SetTitleMatchMode 1
@@ -34,11 +33,14 @@ Defaults(MouseReset=False) { ; Creates and resets default variables for frequent
 	BlockInput, Off
 	BlockInput, MouseMoveOff
 	DetectHiddenWindows, Off
-	If MouseReset
+	If MouseReset {
 		MouseMove, %MouseX%, %MouseY%, 0
+		CoordMode, Mouse, Window
+	}
 }
 InitializeVariables() { ; Create mostly-static global variables
 	global ; create all these variables with global scope
+	gosub BlockAllInput
 	InitializeVariables ++
 	
 	; Regex patterns
@@ -55,10 +57,10 @@ InitializeVariables() { ; Create mostly-static global variables
 	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 	
 	; File Patterns
-	BackupFilePattern := "\*.jpg"
+	BackupFilePattern := "\*.*"
 	
 	; Folders
-	folderArchives := "Z:\folderArchives 2015"
+	folderArchives := "Z:\Archives 2015"
 	folderShawnBackups := "Z:\Shawn\Backups\"
 	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
 	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
@@ -82,7 +84,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	; Run functions & schedule timed events
 	gosub Backups
 	titleblockFolderGroup()
-	Defaults()
+	Defaults(True)
 }
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
 	global
@@ -186,6 +188,7 @@ BlockAllInput:
 	{
 		BlockInput, On
 		BlockInput, MouseMove
+		CoordMode, Mouse, Screen
 		MouseGetPos, MouseX, MouseY
 		MouseMove, 10000, 510
 	}
@@ -538,7 +541,7 @@ $!n:: ;New large Main Browser Window resets workspace
 		IfMsgBox, NO, break
 	}
 	Return
-^!+F1::
+^!+F1:: ;Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
 	For i, value in FolderPath
@@ -550,21 +553,25 @@ $!n:: ;New large Main Browser Window resets workspace
 		MsgBox,,Error,"You need to select the folders to be transferred to Customer before activating."
 		return
 	}
-	; parse selected folders into array then add .jpgs found to filelist
+	; parse selected folders into array
 	FormatTime, CurrentTime, ,yyyyMMdd\HH_mm_ss\
 	Loop,  parse, selectedPaths,`n
 	{
 		FileList := ""
 		LogInput := ""
+		; for each folder that was selected, add the folder to an array. Look for files inside each folder for a given file pattern
 		FolderPath.Insert(A_LoopField)
+		;add matching files to a temp list
 		Loop, % FolderPath[A_Index]BackupFilePattern, 0, 1
 			Filelist = %Filelist%%A_LoopFileLongPath%`n
+		
+		; Parse the list, move the files
 		Loop, Parse, Filelist,`n 
 		{
 			FileMove, %A_LoopField%, %folderArchives%, 1
-			If ErrorLevel 
+			If ErrorLevel != 0 
 			{
-				MsgBox Could not move %A_LoopField% into %DestinationFolder%.
+				MsgBox,,, Could not move %A_LoopField% into %DestinationFolder%. `n ErrorLevel is %ErrorLevel%
 				LogInput := %LogInput%%A_LoopField%`n
 			}
 		}
