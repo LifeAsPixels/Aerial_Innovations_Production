@@ -12,7 +12,7 @@ Script Function	---
 	#SingleInstance force ; Forces a single instance when trying to reopen script
 	#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
-	#Include Z:\Shawn\AI_AHK\Library_Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
+	#Include Library\Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -51,6 +51,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	regexDate8Digit := "^20(\d{6})$"
 	regexDate6Digit := "^(\d{6})$"
 	regexDir := "^(.+\\)(.+?)\\?$"
+	regexRemovePSD := "^(.+?)\.psd$"
 	
 	; Files
 	thisScript := "Z:\Shawn\AI_AHK\Shawn AI Prod.ahk"
@@ -83,12 +84,13 @@ InitializeVariables() { ; Create mostly-static global variables
 	
 	; Run functions & schedule timed events
 	gosub Backups
+	gosub TitleblockFilenames
 	titleblockFolderGroup()
 	Defaults(True)
 }
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
 	global
-	GroupAdd, groupTB, "_Titleblock Templates (1)"
+	GroupAdd, groupTB, _Titleblock Templates (1)
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
 }
@@ -307,6 +309,16 @@ BackupAppdata:
 	}
 	; schedule "BackupAppdata" to run again tomorrow at the same time
 	SetTimer, Backups, 86400000
+	return
+TitleblockFilenames:
+	Filelist := ""
+	Loop , %folderTitleBlocks%*.psd, 0, 1
+	{
+		LoopFileShortNameNoExt := RegExReplace(A_LoopFileName, regexRemovePSD, "$1")
+		Filelist = %Filelist%%LoopFileShortNameNoExt%`n
+	}
+	FileDelete, AI Titleblocks.csv
+	FileAppend, %Filelist%, AI Titleblocks.csv
 	return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		The following section is used for Bridge keyboard shortcuts.
@@ -541,7 +553,7 @@ $!n:: ;New large Main Browser Window resets workspace
 		IfMsgBox, NO, break
 	}
 	Return
-^!+F1::
+^!+F1:: ;Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
 	For i, value in FolderPath
@@ -553,15 +565,19 @@ $!n:: ;New large Main Browser Window resets workspace
 		MsgBox,,Error,"You need to select the folders to be transferred to Customer before activating."
 		return
 	}
-	; parse selected folders into array then add .jpgs found to filelist
+	; parse selected folders into array
 	FormatTime, CurrentTime, ,yyyyMMdd\HH_mm_ss\
 	Loop,  parse, selectedPaths,`n
 	{
 		FileList := ""
 		LogInput := ""
+		; for each folder that was selected, add the folder to an array. Look for files inside each folder for a given file pattern
 		FolderPath.Insert(A_LoopField)
+		;add matching files to a temp list
 		Loop, % FolderPath[A_Index]BackupFilePattern, 0, 1
 			Filelist = %Filelist%%A_LoopFileLongPath%`n
+		
+		; Parse the list, move the files
 		Loop, Parse, Filelist,`n 
 		{
 			FileMove, %A_LoopField%, %folderArchives%, 1

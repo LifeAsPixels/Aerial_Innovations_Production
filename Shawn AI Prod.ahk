@@ -12,7 +12,7 @@ Script Function	---
 	#SingleInstance force ; Forces a single instance when trying to reopen script
 	#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
-	#Include Z:\Shawn\AI_AHK\Library_Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
+	#Include Library\Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -51,6 +51,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	regexDate8Digit := "^20(\d{6})$"
 	regexDate6Digit := "^(\d{6})$"
 	regexDir := "^(.+\\)(.+?)\\?$"
+	regexRemovePSD := "^(.+?)\.psd$"
 	
 	; Files
 	thisScript := "Z:\Shawn\AI_AHK\Shawn AI Prod.ahk"
@@ -65,6 +66,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
 	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
 	folderTitleBlocks := "Z:\_Titleblock Templates (1)\"
+	folderShawnDocs := "Z:\Shawn\Docs\"
 	
 	; Webpages
 	Email := "https://email.1and1.com/appsuite/"
@@ -83,12 +85,13 @@ InitializeVariables() { ; Create mostly-static global variables
 	
 	; Run functions & schedule timed events
 	gosub Backups
+	gosub TitleblockFilenames
 	titleblockFolderGroup()
 	Defaults(True)
 }
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
 	global
-	GroupAdd, groupTB, "_Titleblock Templates (1)"
+	GroupAdd, groupTB, _Titleblock Templates (1)
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
 }
@@ -307,6 +310,16 @@ BackupAppdata:
 	}
 	; schedule "BackupAppdata" to run again tomorrow at the same time
 	SetTimer, Backups, 86400000
+	return
+TitleblockFilenames:
+	Filelist := ""
+	Loop , %folderTitleBlocks%*.psd, 0, 1
+	{
+		LoopFileShortNameNoExt := RegExReplace(A_LoopFileName, regexRemovePSD, "$1")
+		Filelist = %Filelist%%LoopFileShortNameNoExt%`n
+	}
+	FileDelete, %folderShawnDocs%AI Titleblocks.csv
+	FileAppend, %Filelist%, %folderShawnDocs%AI Titleblocks.csv
 	return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		The following section is used for Bridge keyboard shortcuts.
