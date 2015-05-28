@@ -44,7 +44,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	InitializeVariables ++
 	
 	; Regex patterns
-	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(\d{1,5})(.+\.[\w]{1,4})(.+)$"
+	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|0{0,4}(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
 	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
@@ -61,7 +61,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	BackupFilePattern := "\*.*"
 	
 	; Folders
-	folderArchives := "Z:\Archives 2015"
+	folderArchives := "Z:\Archives 2015\"
 	folderShawnBackups := "Z:\Shawn\Backups\"
 	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
 	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
@@ -76,12 +76,19 @@ InitializeVariables() { ; Create mostly-static global variables
 	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AI_AHK"]
 	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
 	
+	;~ TestingValues := {KeyA: "ValueA", KeyB: "ValueB", KeyZ: "ValueZ"}
+	;~ for key, value in TestingValues ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
+		;~ MsgBox,,Simple loop using "A_Index", key : %key%  `nvalue :  %value%
+
 	; Window groups
 	GroupAdd, Photoshop, ahk_class Photoshop
 	GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
 	GroupAdd, EmailClient, New Mail
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
+	
+	
+	
 	
 	; Run functions & schedule timed events
 	gosub Backups
@@ -365,7 +372,7 @@ $!n:: ;New large Main Browser Window resets workspace
 	WinRestore, A
 	SetTitleMatchMode 3
 	WinGetActiveTitle, PsWinTitle
-	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4")
+	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$5")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$6")
 	Send {F2}
 	GoSub WaitXL
@@ -397,6 +404,7 @@ $!n:: ;New large Main Browser Window resets workspace
 ^+F9:: ; Save to Temp Images
 	Send ^b
 	PsBatch(3, 1)
+	WinActivate, Temp ahk_class Bridge WindowClass
 	Return
 ^+F8:: ; Flatten and Save over
 	Send ^b
