@@ -44,7 +44,7 @@ InitializeVariables() { ; Create mostly-static global variables
 	InitializeVariables ++
 	
 	; Regex patterns
-	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|0{0,4}(\d{1,5})(.+\.[\w]{1,4})(.+)$"
+	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
 	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
@@ -372,8 +372,8 @@ $!n:: ;New large Main Browser Window resets workspace
 	WinRestore, A
 	SetTitleMatchMode 3
 	WinGetActiveTitle, PsWinTitle
-	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$5")
-	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$6")
+	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
+	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
 	Send {F2}
 	GoSub WaitXL
 	SetTitleMatchMode Fast
