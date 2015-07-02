@@ -162,7 +162,7 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 	SetTitleMatchMode, Fast
 	WinWaitActive, JPEG Options
 	gosub waitS
-	SendInput {Enter}
+	SendInput 12{Enter}
 	While WinActive(PsFilename) = 0
 	{
 		SendEvent ^{Tab}
@@ -208,9 +208,19 @@ DateParse:
 	StringMid, YY, YYYYMMDD,3,2
 	StringMid, MM, YYYYMMDD,5,2
 	StringRight, DD, YYYYMMDD,2
-	FormatTime, MMMLower, 2015%MM%21, MMM
-	FormatTime, MMMM, 2015%MM%21, MMMM
-	StringUpper, MMM, MMMLower
+	; If the month is June or July, do not abbreviate it anywhere.
+	If (MM = 06 or MM = 07)
+	{
+		FormatTime, MMMLower, 2015%MM%21, MMMM
+		FormatTime, MMMM, 2015%MM%21, MMMM
+		StringUpper, MMM, MMMLower
+	}
+	else
+	{
+		FormatTime, MMMLower, 2015%MM%21, MMM
+		FormatTime, MMMM, 2015%MM%21, MMMM
+		StringUpper, MMM, MMMLower
+	}
 	Return
 FlightDateInput:
 	If WinName =
