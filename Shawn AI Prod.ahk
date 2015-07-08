@@ -208,6 +208,7 @@ DateParse:
 	StringMid, YY, YYYYMMDD,3,2
 	StringMid, MM, YYYYMMDD,5,2
 	StringRight, DD, YYYYMMDD,2
+	
 	; If the month is June or July, do not abbreviate it anywhere.
 	If (MM = 06 or MM = 07)
 	{
@@ -335,6 +336,7 @@ TitleblockFilenames:
 		LoopFileShortNameNoExt := RegExReplace(A_LoopFileName, regexRemovePSD, "$1")
 		Filelist = %Filelist%%LoopFileShortNameNoExt%`n
 	}
+	Sort, Filelist, U
 	FileDelete, %folderShawnDocs%AI Titleblocks.csv
 	FileAppend, %Filelist%, %folderShawnDocs%AI Titleblocks.csv
 	return
