@@ -25,7 +25,6 @@ Defaults(MouseReset = False) { ; Creates and resets default variables for freque
 	*/
 	global
 	CoordMode, Mouse, Screen
-	
 	BrBatchRun := 0
 	SendMode Event
 	SetTitleMatchMode 1
@@ -86,9 +85,6 @@ InitializeVariables() { ; Create mostly-static global variables
 	GroupAdd, EmailClient, New Mail
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
-	
-	
-	
 	
 	; Run functions & schedule timed events
 	gosub Backups
@@ -186,9 +182,6 @@ Wait(Seconds) { ;creating a new syntax for pausing in AHK
 	If Seconds <= 0
 		return
 	Sleep %Seconds%
-}
-MoveFilesAndFolders(SourcePattern, DestinationFolder, DoOverwrite = false) { ;currently unused
-	
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Substrings (Labels).
@@ -344,35 +337,35 @@ TitleblockFilenames:
 ;		The following section is used for Bridge keyboard shortcuts.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #IfWinActive ahk_class Bridge_WindowClass
-!F12:: ;96 ppi TB/CR
+!F12:: ; 96 ppi TB/CR
 	GoSub BrBatch
 	PsBatch(3, 5)
 	Return
-!F11:: ;96 ppi CR
+!F11:: ; 96 ppi CR
 	GoSub BrBatch
 	PsBatch(3, 6)
 	Return
-!F10:: ;96 ppi
+!F10:: ; 96 ppi
 	GoSub BrBatch
 	PsBatch(3, 7)
 	Return
-!F8:: ;300 ppi TB/CR to CD Folder
+!F8:: ; 300 ppi TB/CR to CD Folder
 	GoSub BrBatch
 	PsBatch(3, 2)
 	Return
-!F7:: ;300 ppi CR to CD Folder
+!F7:: ; 300 ppi CR to CD Folder
 	GoSub BrBatch
 	PsBatch(3, 3)
 	Return
-!p:: ;Basic action to edit in Photoshop
+!p:: ; Basic action to edit in Photoshop
 	GoSub BrBatch
 	PsBatch(0, 0)
 	WinActivate, ahk_class CabinetWClass ahk_group groupTB
 	Return
-$^n:: ;New small Basic window resets workspace
+$^n:: ; New small Basic window resets workspace
 	Send ^n^{F2}!ww{Enter}
 	Return
-$!n:: ;New large Main Browser Window resets workspace
+$!n:: ; New large Main Browser Window resets workspace
 	Send ^n^{F1}!ww{Enter}
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -380,6 +373,7 @@ $!n:: ;New large Main Browser Window resets workspace
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #IfWinActive ahk_group Photoshop
 +F12:: ; Captures tab title, stores file number & use PS action Flat/Sharp
+	gosub BlockAllInput
 	WinMaximize, A
 	WinRestore, A
 	SetTitleMatchMode 3
@@ -390,14 +384,9 @@ $!n:: ;New large Main Browser Window resets workspace
 	GoSub WaitXL
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
-	gosub BlockAllInput
 	Send !w1
 	Send ^+{tab}
-	Defaults()
-	Return
-+F11:: ; Paste Into Action
-	GoSub BlockAllInput
-	;~ GoSub WaitS
+	GoSub WaitM
 	Send +{F2}
 	GoSub WaitS
 	GoSub WaitXS
@@ -405,6 +394,8 @@ $!n:: ;New large Main Browser Window resets workspace
 	Send ^0
 	Defaults(True)
 	MouseMove, 1307, 937
+	Return
++F11:: ; Paste Into Action
 	Return
 ^+F11:: ; Save As automate for TB images
 	PsSaveAs("C:\Users\WS2\Desktop\Temp","Address: C:\Users\WS2\Desktop\Temp")
@@ -466,7 +457,7 @@ $!n:: ;New large Main Browser Window resets workspace
 ^+`::
 	Defaults()
 	Return
-^+e:: ;set explorer working space for production
+^+e:: ; set explorer working space for production
 	SetTitleMatchMode 3
 	Loop
 	{
@@ -574,7 +565,7 @@ $!n:: ;New large Main Browser Window resets workspace
 		IfMsgBox, NO, break
 	}
 	Return
-^!+F1:: ;Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
+^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
 	For i, value in FolderPath
@@ -594,7 +585,7 @@ $!n:: ;New large Main Browser Window resets workspace
 		LogInput := ""
 		; for each folder that was selected, add the folder to an array. Look for files inside each folder for a given file pattern
 		FolderPath.Insert(A_LoopField)
-		;add matching files to a temp list
+		; add matching files to a temp list
 		Loop, % FolderPath[A_Index]BackupFilePattern, 0, 1
 			Filelist = %Filelist%%A_LoopFileLongPath%`n
 		
