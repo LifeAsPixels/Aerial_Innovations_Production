@@ -13,36 +13,17 @@ Script Function	---
 	#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
 	#Include Library\Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
+	#include Library\Defaults.ahk
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Defaults(MouseReset = False) { ; Creates and resets default variables for frequently changed variables
-	/*
-	This function sets default variables that are commonly used with assumed values
-	Passing True through this function will snap the mouse back to a stored location
-	*/
-	global
-	CoordMode, Mouse, Screen
-	BrBatchRun := 0
-	SendMode Event
-	SetTitleMatchMode 1
-	SetTitleMatchMode Fast
-	BlockInput, Off
-	BlockInput, MouseMoveOff
-	DetectHiddenWindows, Off
-	If MouseReset {
-		MouseMove, %MouseX%, %MouseY%, 0
-		CoordMode, Mouse, Window
-	}
-}
 InitializeVariables() { ; Create mostly-static global variables
 	global ; create all these variables with global scope
-	gosub BlockAllInput
-	InitializeVariables ++
-	
-	; Regex patterns
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	; RegEx Variables
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
@@ -52,14 +33,19 @@ InitializeVariables() { ; Create mostly-static global variables
 	regexDir := "^(.+\\)(.+?)\\?$"
 	regexRemovePSD := "^(.+?)\.psd$"
 	
-	; Files
-	thisScript := "Z:\Shawn\AI_AHK\Shawn AI Prod.ahk"
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	; File Locations
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 	
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; File Patterns
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	BackupFilePattern := "\*.*"
 	
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Folders
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	folderArchives := "Z:\Archives 2015\"
 	folderShawnBackups := "Z:\Shawn\Backups\"
 	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
@@ -67,11 +53,15 @@ InitializeVariables() { ; Create mostly-static global variables
 	folderTitleBlocks := "Z:\_Titleblock Templates (1)\"
 	folderShawnDocs := "Z:\Shawn\Docs\"
 	
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Webpages
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	Email := "https://email.1and1.com/appsuite/"
 	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
 
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Arrays
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AI_AHK"]
 	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
 	
@@ -79,14 +69,18 @@ InitializeVariables() { ; Create mostly-static global variables
 	;~ for key, value in TestingValues ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
 		;~ MsgBox,,Simple loop using "A_Index", key : %key%  `nvalue :  %value%
 
-	; Window groups
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	; Window Groups
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	GroupAdd, Photoshop, ahk_class Photoshop
 	GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
 	GroupAdd, EmailClient, New Mail
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
 	
-	; Run functions & schedule timed events
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	; Run Functions and Timed Events
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	gosub Backups
 	gosub TitleblockFilenames
 	titleblockFolderGroup()
@@ -183,9 +177,9 @@ Wait(Seconds) { ;creating a new syntax for pausing in AHK
 		return
 	Sleep %Seconds%
 }
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;		Substrings (Labels).
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Substrings
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 BlockAllInput:
 	If BrBatchRun = 0
 	{
@@ -333,9 +327,9 @@ TitleblockFilenames:
 	FileDelete, %folderShawnDocs%AI Titleblocks.csv
 	FileAppend, %Filelist%, %folderShawnDocs%AI Titleblocks.csv
 	return
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;		The following section is used for Bridge keyboard shortcuts.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Adobe Bridge Shortcuts
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #IfWinActive ahk_class Bridge_WindowClass
 !F12:: ; 96 ppi TB/CR
 	GoSub BrBatch
@@ -368,9 +362,9 @@ $^n:: ; New small Basic window resets workspace
 $!n:: ; New large Main Browser Window resets workspace
 	Send ^n^{F1}!ww{Enter}
 	Return
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;		The following section is used for Photoshop keyboard shortcuts.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Adobe Photoshop Shortcuts
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #IfWinActive ahk_group Photoshop
 +F12:: ; Captures tab title, stores file number & use PS action Flat/Sharp
 	gosub BlockAllInput
@@ -447,12 +441,12 @@ $!n:: ; New large Main Browser Window resets workspace
 	TBFilenamePrefix := RegExReplace(WinName,regexPStabTB,"$1")
 	MsgBox,,Titel Block Window, The TB Window is:`n%WinName%`n`nThe prefix is:`n%TBFilenamePrefix%
 	Return
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;		The following section is used for Generic keyboard shortcuts.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; General Shortcuts
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #IfWinActive
-^`:: ; Close AHK script
-	Run, %thisScript%
+^`:: ; Re-open this AHK script
+	Run, %A_ScriptFullPath%
 	ExitApp
 ^+`::
 	Defaults()
@@ -553,17 +547,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Defaults()
 	Return
 ^!NumpadAdd:: ; go to window captured
-	WinGet, id, list,,, Program Manager
-	Loop, %id%
-	{
-		this_id := id%A_Index%
-		WinActivate, ahk_id %this_id%
-		WinGetClass, this_class, ahk_id %this_id%
-		WinGetTitle, this_title, ahk_id %this_id%
-		WinGet, this_pid, PID, ahk_id %this_id%
-		MsgBox, 4, , Visiting All Windows`n%a_index% of %id%`nahk_id %this_id%`nahk_pid %this_pid%`nahk_class %this_class%`n%this_title%`n`nContinue?
-		IfMsgBox, NO, break
-	}
+	WinGetAll(False, True)
 	Return
 ^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
