@@ -9,30 +9,31 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #Include Library\Get_Explorer_Paths.ahk
 #Include Library\WinGetAll.ahk
+#Include Library\Defaults.ahk
 InitializeVariables()
 Return
 
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Functions
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 InitializeVariables() {
 	global ; create all these variables with global scope
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; RegEx Variables
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	runNoExplorer := "^https?|.exe$"
 	runBat := ".bat"
 	
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Static Variables
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Arrays
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; WAMP, GitHub, LCS Site local explorer, mySQL local explorer, asana, phpmyadmin, LCS site localhost, fantasy API, Riot API, toggl
-	LCSfantasyTrackerWorkspace := ["C:\Program Files\wamp\wampmanager.exe", "Resources\GitHub.bat", "C:\Program Files\wamp\www\LCS-Fantasy-Tracker", "C:\Program Files\wamp\bin\mysql", "https://app.asana.com/", "http://localhost/phpmyadmin/index.php", "http://localhost/lcs-fantasy-tracker/index.php", "http://na.lolesports.com/api/swagger#!/api", "https://developer.riotgames.com/api/methods", "https://www.toggl.com/app/timer"]
-	LCSfantasyTrackerWorkspaceTitles := ["AeTrayMenu[{wampserver}]", "GitHub", "LCS-Fantasy-Tracker", "mysql", "Asana", "localhost / mysql wampserver | phpMyAdmin", "", "Swagger documentation | LoL Esports", "API Documentation - Riot Games API", "Toggl"]
+	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	; WAMP, GitHub, Brackets, LCS Site local explorer, mySQL local explorer, asana, phpmyadmin, LCS site localhost, fantasy API, Riot API, toggl
+	LCSfantasyTrackerWorkspace := ["C:\Program Files\wamp\wampmanager.exe", "Resources\GitHub.bat", "C:\Program Files (x86)\Brackets\Brackets.exe", "C:\Program Files\wamp\www\LCS-Fantasy-Tracker", "C:\Program Files\wamp\bin\mysql", "https://app.asana.com/", "http://localhost/phpmyadmin/index.php", "http://localhost/lcs-fantasy-tracker/index.php", "http://na.lolesports.com/api/swagger#!/api", "https://developer.riotgames.com/api/methods", "https://www.toggl.com/#"]
+	LCSfantasyTrackerWorkspaceTitles := ["AeTrayMenu[{wampserver}]", "GitHub", "ahk_exe Brackets.exe", "LCS-Fantasy-Tracker", "mysql", "Asana", "localhost / mysql wampserver | phpMyAdmin", "", "Swagger documentation | LoL Esports", "API Documentation - Riot Games API", "Toggl"]
 
 	gosub Daily
 	Defaults()
@@ -55,6 +56,7 @@ Open(pathName, winTitles) { ; pathName is opened, but not if a corresponding win
 				else
 					Run explore %value%
 			}
+			gosub WaitXS
 		}
 	}
 }
@@ -69,9 +71,9 @@ SongKickSearch() {
 		run, %SKSearch%%A_LoopField%%SKSearching%
 	}
 }
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Substrings
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 Daily:
 gosub iTunesBackup
 SetTimer, Daily, 86400000
@@ -106,9 +108,9 @@ WaitXXXL:
 	Sleep 1500
 	Return
 
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Hotkeys
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ^`:: ; Re-open this AHK script
 	Run, %A_ScriptFullPath%
 	ExitApp

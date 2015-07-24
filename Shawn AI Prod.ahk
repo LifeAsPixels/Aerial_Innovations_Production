@@ -14,6 +14,7 @@ Script Function	---
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
 	#Include Library\Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
 	#include Library\Defaults.ahk
+	#include Library\WinGetAll.ahk
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
