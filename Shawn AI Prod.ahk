@@ -24,7 +24,6 @@ InitializeVariables() { ; Create mostly-static global variables
 	global ; create all these variables with global scope
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; RegEx Variables
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
@@ -33,58 +32,45 @@ InitializeVariables() { ; Create mostly-static global variables
 	regexDate6Digit := "^(\d{6})$"
 	regexDir := "^(.+\\)(.+?)\\?$"
 	regexRemovePSD := "^(.+?)\.psd$"
-	
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; File Locations
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
-	
+	Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
+	Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; File Patterns
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	BackupFilePattern := "\*.*"
-	
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Folders
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	folderArchives := "Z:\Archives 2015\"
 	folderShawnBackups := "Z:\Shawn\Backups\"
 	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
 	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
 	folderTitleBlocks := "Z:\_Titleblock Templates (1)\"
 	folderShawnDocs := "Z:\Shawn\Docs\"
-	
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Webpages
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	Email := "https://email.1and1.com/appsuite/"
 	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
-
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Arrays
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\AI_AHK"]
+	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\SN_AHK"]
 	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
-	
-	;~ TestingValues := {KeyA: "ValueA", KeyB: "ValueB", KeyZ: "ValueZ"}
-	;~ for key, value in TestingValues ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
-		;~ MsgBox,,Simple loop using "A_Index", key : %key%  `nvalue :  %value%
-
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Window Groups
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	GroupAdd, Photoshop, ahk_class Photoshop
 	GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
 	GroupAdd, EmailClient, New Mail
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
-	
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Run Functions and Timed Events
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	Defaults(True)
 	gosub Backups
 	gosub TitleblockFilenames
 	titleblockFolderGroup()
+	RunProgram("ahk_exe Photoshop.exe", Photoshop) 
+	RunProgram("ahk_exe Bridge.exe", Bridge)
 	Defaults(True)
 }
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
@@ -162,13 +148,13 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 	SendEvent ^{Tab}
 	Defaults()
 }
-RunProgram(WinTitle, File, Path) { ; Run a program only if it isn't already running
+RunProgram(WinTitle, FilePath) { ; Run a program only if it isn't already running
 	SetTitleMatchMode, 2 ; approximate match
 	IfWinExist, %WinTitle%
 		WinActivate, %WinTitle%
 	else
 	{
-		Run, %File%, %Path%
+		Run, %FilePath%
 		WinWaitActive, %WinTitle%
 	}
 }
