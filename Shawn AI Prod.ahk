@@ -12,7 +12,7 @@ Script Function	---
 	#SingleInstance force ; Forces a single instance when trying to reopen script
 	#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
-	#Include Library\Get_Explorer_Paths.ahk ;Library - gets explorer file and window paths
+	#Include Library\Get_Explorer_Paths.ahk ; Library - gets explorer file and window paths
 	#include Library\Defaults.ahk
 	#include Library\WinGetAll.ahk
 	InitializeVariables()
@@ -375,11 +375,6 @@ $!n:: ; New large Main Browser Window resets workspace
 	Send ^0
 	Defaults(True)
 	MouseMove, 1307, 937
-	Return
-+F11:: ; Unused
-	Return
-^+F11:: ; Save As automate for TB images
-	PsSaveAs("C:\Users\WS2\Desktop\Temp","Address: C:\Users\WS2\Desktop\Temp")
 	Return
 ^+F10:: ; Save As automate for TB images
 	;~ PsSaveAs("Y:\","Address: Y:\")
