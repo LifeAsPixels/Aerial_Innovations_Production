@@ -376,14 +376,14 @@ $!n:: ; New large Main Browser Window resets workspace
 	Defaults(True)
 	MouseMove, 1307, 937
 	Return
-^+F10:: ; Save As automate for TB images
-	;~ PsSaveAs("Y:\","Address: Y:\")
-	PsSaveAs("C:\Users\WS2\Desktop\Temp", "Address: C:\Users\WS2\Desktop\Temp")
-	Return
 ^+F9:: ; Save to Temp Images
 	Send ^b
 	PsBatch(3, 1)
 	WinActivate, Temp ahk_class Bridge WindowClass
+	Return
+^+F10:: ; Save As automate for TB images
+	;~ PsSaveAs("Y:\","Address: Y:\")
+	PsSaveAs("C:\Users\WS2\Desktop\Temp", "Address: C:\Users\WS2\Desktop\Temp")
 	Return
 ^+F8:: ; Flatten and Save over
 	Send ^b
