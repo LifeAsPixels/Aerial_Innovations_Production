@@ -71,6 +71,13 @@ SongKickSearch() {
 		run, %SKSearch%%A_LoopField%%SKSearching%
 	}
 }
+
+PhotoShelterPrintPricingInsert() { ; copy a sheet of prices separated by line breaks and this will auto input them into the listing
+	Loop, parse, clipboard, `n, `r
+	{
+		send %A_LoopField%{Tab}
+	}
+}
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Substrings
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -126,4 +133,9 @@ WaitXXXL:
 
 ^!+F12::
 	SongKickSearch()
-Return
+	return
+
+^!+F11::
+	gosub WaitL
+	PhotoShelterPrintPricingInsert()
+	return
