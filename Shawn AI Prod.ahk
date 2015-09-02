@@ -24,8 +24,8 @@ InitializeVariables() { ; Create mostly-static global variables
 	global ; create all these variables with global scope
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; RegEx Variables
-	regexOrigFilename := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
-	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
+	regexOrigFilename := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
+	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
 	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
 	regexDate8Digit := "^20(\d{6})$"
@@ -184,18 +184,16 @@ DateParse:
 	StringRight, DD, YYYYMMDD,2
 	
 	; If the month is June or July, do not abbreviate it anywhere.
-	If (MM = 06 or MM = 07)
+	If (MM = 06 or MM = 07 or MM = 09)
 	{
 		FormatTime, MMMLower, 2015%MM%21, MMMM
-		FormatTime, MMMM, 2015%MM%21, MMMM
-		StringUpper, MMM, MMMLower
 	}
 	else
 	{
 		FormatTime, MMMLower, 2015%MM%21, MMM
-		FormatTime, MMMM, 2015%MM%21, MMMM
-		StringUpper, MMM, MMMLower
 	}
+	FormatTime, MMMM, 2015%MM%21, MMMM
+	StringUpper, MMM, MMMLower
 	Return
 FlightDateInput:
 	If WinName =
