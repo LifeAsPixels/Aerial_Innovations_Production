@@ -184,9 +184,13 @@ DateParse:
 	StringRight, DD, YYYYMMDD,2
 	
 	; If the month is June or July, do not abbreviate it anywhere.
-	If (MM = 06 or MM = 07 or MM = 09)
+	If (MM = 06 or MM = 07)
 	{
 		FormatTime, MMMLower, 2015%MM%21, MMMM
+	}
+	else if (MM = 09)
+	{
+		MMMLower := "SEPT"
 	}
 	else
 	{
