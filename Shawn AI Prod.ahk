@@ -20,7 +20,7 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-InitializeVariables() { ; Create mostly-static global variables
+InitializeVariables(NetworkDrive  = True) { ; Create mostly-static global variables
 	global ; create all these variables with global scope
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; RegEx Variables
@@ -33,28 +33,20 @@ InitializeVariables() { ; Create mostly-static global variables
 	regexDir := "^(.+\\)(.+?)\\?$"
 	regexRemovePSD := "^(.+?)\.psd$"
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; File Locations
+	; Local File and Folder Locations
 	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 	Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
 	Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
+	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; File Patterns
 	BackupFilePattern := "\*.*"
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Folders
-	folderArchives := "Z:\Archives 2015\"
-	folderShawnBackups := "Z:\Shawn\Backups\"
-	folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
-	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
-	folderTitleBlocks := "Z:\_Titleblock Templates (1)\"
-	folderShawnDocs := "Z:\Shawn\Docs\"
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Webpages
 	Email := "https://email.1and1.com/appsuite/"
 	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Arrays
-	ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates (1)", "Z:\Shawn\SN_AHK"]
+	; Local Arrays
 	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	; Window Groups
@@ -64,6 +56,26 @@ InitializeVariables() { ; Create mostly-static global variables
 	GroupAdd, EmailClient, 1&1 Webmail Inbox
 	GroupAdd, EmailClient, E-mail and Online Storage
 	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	; Folder Location Switch
+	If (NetworkDrive = True) {
+		; Network folders
+		folderArchives := "Z:\Archives 2015\"
+		folderShawnBackups := "Z:\Shawn\Backups\"
+		folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
+		folderTitleBlocks := "Z:\_Titleblock Templates\"
+		folderShawnDocs := "Z:\Shawn\Docs\"
+		ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates", "Z:\Shawn\SN_AHK"]
+	}
+	else{
+		; Local folders
+		folderArchives := "E:\Common\Archives 2015\"
+		folderShawnBackups := "E:\Common\Shawn\Backups\"
+		folderNASRecycle := "E:\Common\Shawn\Backups\Recycle\"
+		folderTitleBlocks := "E:\Common\_Titleblock Templates\"
+		folderShawnDocs := "E:\Common\Shawn\Docs\"
+		ProdExplorer := ["E:\Customer\Email Folder", "E:\Customer\CD Folder", "E:\Common\_Titleblock Templates", "E:\Common\Shawn\SN_AHK"]
+	}
+		
 	; Run Functions and Timed Events
 	Defaults(True)
 	gosub Backups
@@ -73,9 +85,12 @@ InitializeVariables() { ; Create mostly-static global variables
 	RunProgram("ahk_exe Bridge.exe", Bridge)
 	Defaults(True)
 }
+
+
+
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
 	global
-	GroupAdd, groupTB, _Titleblock Templates (1)
+	GroupAdd, groupTB, _Titleblock Templates
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
 }
@@ -483,7 +498,11 @@ $!n:: ; New large Main Browser Window resets workspace
 	else
 		WinActivate, Email Folder
 	Defaults()
-	Return
+	return
+^!d:: ; Draft title block email template
+	Send {space}Title Block Approval{Tab}
+	Send The draft title block for this project is attached. Please let us know if this looks good or if any changes need to be made.{Enter}Thanks{!}{Enter}Shawn{Enter}
+	return
 !NumpadDiv:: ; Input Flight Date variable
 	GoSub FlightDateInput
 	Return
