@@ -15,78 +15,26 @@ Script Function	---
 	#Include Library\Get_Explorer_Paths.ahk ; Library - gets explorer file and window paths
 	#include Library\Defaults.ahk
 	#include Library\WinGetAll.ahk
+	#include Config\AIGlobalVariables.ahk
+	#include Config\AIUserVariables.ahk
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-InitializeVariables(NetworkDrive  = True) { ; Create mostly-static global variables
+InitializeVariables() { ; Create mostly-static global variables
 	global ; create all these variables with global scope
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; RegEx Variables
-	regexOrigFilename := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
-	regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
-	regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
-	regexDateValid := "^(?:20)?\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
-	regexDate8Digit := "^20(\d{6})$"
-	regexDate6Digit := "^(\d{6})$"
-	regexDir := "^(.+\\)(.+?)\\?$"
-	regexRemovePSD := "^(.+?)\.psd$"
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Local File and Folder Locations
-	Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
-	Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
-	Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
-	folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; File Patterns
-	BackupFilePattern := "\*.*"
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Webpages
-	Email := "https://email.1and1.com/appsuite/"
-	Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Local Arrays
-	AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Window Groups
-	GroupAdd, Photoshop, ahk_class Photoshop
-	GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
-	GroupAdd, EmailClient, New Mail
-	GroupAdd, EmailClient, 1&1 Webmail Inbox
-	GroupAdd, EmailClient, E-mail and Online Storage
-	;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	; Folder Location Switch
-	If (NetworkDrive = True) {
-		; Network folders
-		folderArchives := "Z:\Archives 2015\"
-		folderShawnBackups := "Z:\Shawn\Backups\"
-		folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
-		folderTitleBlocks := "Z:\_Titleblock Templates\"
-		folderShawnDocs := "Z:\Shawn\Docs\"
-		ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates", "Z:\Shawn\SN_AHK"]
-	}
-	else{
-		; Local folders
-		folderArchives := "E:\Common\Archives 2015\"
-		folderShawnBackups := "E:\Common\Shawn\Backups\"
-		folderNASRecycle := "E:\Common\Shawn\Backups\Recycle\"
-		folderTitleBlocks := "E:\Common\_Titleblock Templates\"
-		folderShawnDocs := "E:\Common\Shawn\Docs\"
-		ProdExplorer := ["E:\Customer\Email Folder", "E:\Customer\CD Folder", "E:\Common\_Titleblock Templates", "E:\Common\Shawn\SN_AHK"]
-	}
-		
+	
 	; Run Functions and Timed Events
-	Defaults(True)
 	gosub Backups
 	gosub TitleblockFilenames
 	titleblockFolderGroup()
 	RunProgram("ahk_exe Photoshop.exe", Photoshop) 
 	RunProgram("ahk_exe Bridge.exe", Bridge)
+	
 	Defaults(True)
+	MsgBox, ,Startup Complete, Startup Complete
 }
-
-
 
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
 	global
@@ -157,8 +105,11 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 	SendInput 12{Enter}
 	While WinActive(PsFilename) = 0
 	{
+		if (A_Index = 1){
+			gosub WaitS
+		}
 		SendEvent ^{Tab}
-		GoSub WaitS
+		gosub WaitS
 	}
 	SendEvent ^{Tab}
 	Defaults()
@@ -383,29 +334,33 @@ $!n:: ; New large Main Browser Window resets workspace
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	Send !w1
-	GoSub WaitS
+	GoSub WaitM
 	Send ^+{tab}
-	GoSub WaitL
+	GoSub WaitM
 	Send +{F2}
 	GoSub WaitS
-	GoSub WaitXS
 	Send ^t
 	Send ^0
 	Defaults(True)
 	MouseMove, 1307, 937
 	Return
-^+F9:: ; Save to Temp Images
+^+F9:: ; Flatten and save to Temp
 	Send ^b
 	PsBatch(3, 1)
 	WinActivate, Temp ahk_class Bridge WindowClass
 	Return
-^+F10:: ; Save As automate for TB images
+^+F10:: ; Save As automation for TB images
 	;~ PsSaveAs("Y:\","Address: Y:\")
 	PsSaveAs("C:\Users\WS2\Desktop\Temp", "Address: C:\Users\WS2\Desktop\Temp")
 	Return
 ^+F8:: ; Flatten and Save over
 	Send ^b
 	PsBatch(2, 0)
+	Return
+^+F7:: ; Flattten, sharpen, and save to Temp
+	Send ^b
+	PsBatch(3, 0)
+	WinActivate, Temp ahk_class Bridge WindowClass
 	Return
 ~$^!w:: ; Auto close all Photoshop windows
 	WinWaitActive ahk_class #32770
@@ -437,6 +392,10 @@ $!n:: ; New large Main Browser Window resets workspace
 	Defaults()
 	Return
 ^NumpadAdd:: ; Set active window as TB window similar to +F12
+	Send ^{Tab}
+	Gosub WaitS
+	Send ^+{Tab}
+	Gosub WaitS
 	WinGetActiveTitle, WinName
 	TBFilenamePrefix := RegExReplace(WinName,regexPStabTB,"$1")
 	MsgBox,,Titel Block Window, The TB Window is:`n%WinName%`n`nThe prefix is:`n%TBFilenamePrefix%
@@ -491,18 +450,27 @@ $!n:: ; New large Main Browser Window resets workspace
 	GoSub FlightDateValidate
 	GoSub BlockAllInput
 	Send {End} - Aerial Photos{Space}
-	SendInput %MMMM% %DD%, %YYYY%{Tab}
-	SendInput Thank you. Have a wonderful day{!}{Enter}- Shawn{Enter}
-	gosub WaitL
-	If winactive("Hightail" ahk_class YsiMainWindow)
+	SendInput %MMMM% %DD%, %YYYY%
+	If winactive("Hightail" ahk_class YsiMainWindow){
+		SendInput {Tab}
+		gosub WaitXS
+		SendInput %emailSigAerialPhotos%%userName%{Enter}
+		gosub WaitS
 		WinActivate, CD Folder
-	else
+	}
+	else {
+		SendInput {Tab 4}
+		gosub WaitXS
+		SendInput %emailSigAerialPhotos%%userName%{Enter}
+		gosub WaitXS
 		WinActivate, Email Folder
+	}
 	Defaults()
 	return
 ^!d:: ; Draft title block email template
-	Send {space}Title Block Approval{Tab}
-	Send The draft title block for this project is attached. Please let us know if this looks good or if any changes need to be made.{Enter}Thanks{!}{Enter}Shawn{Enter}
+	Send {space}Title Block Approval{Tab 4}
+	SendInput %emailSigTitleblockApproval%%userName%{Enter}
+	WinActivate, groupTB
 	return
 !NumpadDiv:: ; Input Flight Date variable
 	GoSub FlightDateInput
@@ -516,17 +484,12 @@ $!n:: ; New large Main Browser Window resets workspace
 	ArrayPrint(ProdExplorer)
 	ListVars
 	Return
-
-^NumpadMult:: ; Automatically Move .jpg files to archive folder
-	Loop, 
-	if A_LoopFileAttrib contains N
-	return
 ^!NumpadSub:: ; get window testing show hidden PS files
 	WinGetActiveTitle, PsWinTitle
 	WinGet, WindowTabID, ID
 	ListVars
 	Return
-^+!NumpadAdd:: ; capture window names to CSV
+^+!NumpadAdd:: ; capture window names to CSV for debugging
 	GoSub BlockAllInput
 	DetectHiddenWindows, On
 	WinGet, id, list,,, Program Manager
@@ -550,7 +513,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	MsgBox, , Window Parse Complete, %id% windows parsed.
 	Defaults()
 	Return
-^!NumpadAdd:: ; go to window captured
+^!NumpadAdd:: ; cycle though all windows for debugging
 	WinGetAll(False, True)
 	Return
 ^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
@@ -580,7 +543,7 @@ $!n:: ; New large Main Browser Window resets workspace
 		; Parse the list, move the files
 		Loop, Parse, Filelist,`n 
 		{
-			FileMove, %A_LoopField%, %folderArchives%, 1
+			FileMove, %A_LoopField%, %folderArchivesTemp%, 1
 			If ErrorLevel != 0 
 			{
 				MsgBox,,, Could not move %A_LoopField% into %DestinationFolder%. `n ErrorLevel is %ErrorLevel%
@@ -597,3 +560,6 @@ $!n:: ; New large Main Browser Window resets workspace
 	}
 	MsgBox,,, Backup Complete
 	return
+	
+^!+F12::
+Send %emailSigAerialPhotos%
