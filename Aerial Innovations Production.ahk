@@ -321,11 +321,12 @@ $!n:: ; New large Main Browser Window resets workspace
 	Send ^{Tab}
 	gosub WaitS
 	Send ^+{Tab}
+	gosub WaitS
 	SetTitleMatchMode 3
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
-	MsgBox, ,pswindow name captured, %PsWinTitle%
+	;~ MsgBox, ,pswindow name captured, %PsWinTitle%
 	GoSub WaitXXXL
 	Send {F2}
 	GoSub WaitXXXL
