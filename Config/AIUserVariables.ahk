@@ -2,7 +2,7 @@
 Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
 Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
-folderDesktopTemp := "C:\Users\Laura\Desktop\Temp\"
+folderDesktopTemp := "C:\Users\Laura\Desktop\Temp"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Local Folders
 folderShawnDocs := "Z:\Shawn\Docs\"

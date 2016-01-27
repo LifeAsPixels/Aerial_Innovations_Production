@@ -64,6 +64,7 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop SaveAs GUI
 	global
 	GoSub FlightDateValidate
+	gosub WaitS
 	SendInput ^+s
 	WinWaitActive ahk_class #32770
 	SetTitleMatchMode 3
@@ -137,6 +138,7 @@ Wait(Seconds) { ;creating a new syntax for pausing in AHK
 ; Substrings
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 BlockAllInput:
+	gosub WaitM
 	BlockInput, On
 	BlockInput, MouseMove
 	CoordMode, Mouse, Screen
@@ -223,6 +225,13 @@ BridgeBatch:
 	If !ErrorLevel
 		Send !y
 	Return
+PsCaptureWindowSafely:
+	;~ gosub WaitS
+	Send ^{Tab}
+	gosub WaitS
+	Send ^+{Tab}
+	gosub WaitXS
+	return
 WaitXXXS:
 	Sleep 1
 	Return
@@ -318,10 +327,7 @@ $!n:: ; New large Main Browser Window resets workspace
 #IfWinActive ahk_group Photoshop
 +F12:: ; Captures tab title, stores file number & use PS action Flat/Sharp
 	gosub BlockAllInput
-	Send ^{Tab}
-	gosub WaitS
-	Send ^+{Tab}
-	gosub WaitS
+	gosub PsCaptureWindowSafely
 	SetTitleMatchMode 3
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
@@ -337,7 +343,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Send ^+{tab}
 	GoSub WaitXL
 	Send +{F2}
-	GoSub WaitS
+	GoSub WaitM
 	Send ^t
 	Send ^0
 	Defaults(True)
@@ -349,7 +355,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Return
 ^+F10:: ; Save As automation for TB images
 	;~ PsSaveAs("Y:\","Address: Y:\")
-	PsSaveAs("C:\Users\WS2\Desktop\Temp", "Address: C:\Users\WS2\Desktop\Temp")
+	PsSaveAs(folderDesktopTemp, "Address: " . folderDesktopTemp)
 	Return
 ^+F9:: ; Flatten and save to Temp
 	PsBatch(3, 1, false)
@@ -379,8 +385,6 @@ $!n:: ; New large Main Browser Window resets workspace
 	Gosub WaitM
 	SendInput v^s
 	Gosub WaitS
-	WinMaximize A
-	WinRestore A
 	WinGetActiveTitle, WinName
 	TBFilenamePrefix := RegExReplace(WinName,regexPStabTB,"$1")
 	SendInput ^{Tab}
@@ -444,7 +448,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	SendInput %MMMM% %DD%, %YYYY%
 	If winactive("Hightail" ahk_class YsiMainWindow){
 		SendInput {Tab}
-		gosub WaitM
+		gosub WaitL
 		SendInput %emailSigAerialPhotos%%userName%{Enter}
 		gosub WaitS
 		WinActivate, CD Folder

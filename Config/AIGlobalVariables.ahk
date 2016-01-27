@@ -11,6 +11,10 @@ regexRemovePSD := "^(.+?)\.psd$"
 ; File Patterns
 BackupFilePattern := "\*.*"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Folders
+folderArchives := "Z:\Archives\Temp\"
+folderTitleBlocks := "Z:\_Titleblock Templates\"
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Window Groups
 GroupAdd, Photoshop, ahk_class Photoshop
 GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
@@ -24,3 +28,4 @@ Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Local Arrays
 AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
+
