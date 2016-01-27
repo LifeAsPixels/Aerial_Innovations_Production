@@ -246,8 +246,12 @@ WaitL:
 WaitXL:
 	Sleep 1000
 	Return
-WaitXXXL:
+WaitXXL:
 	Sleep 1500
+	return
+WaitXXXL:
+	Sleep 5000
+	return
 Backups:
 	gosub, BackupAppdata
 	return
@@ -322,23 +326,41 @@ $!n:: ; New large Main Browser Window resets workspace
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #IfWinActive ahk_group Photoshop
 +F12:: ; Captures tab title, stores file number & use PS action Flat/Sharp
-	gosub BlockAllInput
+	;~ gosub BlockAllInput
 	WinMaximize, A
 	WinRestore, A
 	SetTitleMatchMode 3
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
-	Send {F2}
-	GoSub WaitXL
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
-	Send !w1
-	GoSub WaitM
+	
+	Sleep 3000
+	;~ GoSub WaitXXXL
+	Send {F2}
+	
+	Sleep 3000
+	;~ GoSub WaitXXXL
+	Send !w
+	
+	
+	;~ Sleep 3000
+	
+	Send 1
+	
+	;~ Sleep 3000
+	GoSub WaitL
 	Send ^+{tab}
-	GoSub WaitM
+	
+	;~ Sleep 3000
+	GoSub WaitL
 	Send +{F2}
-	GoSub WaitS
+	
+	;~ Sleep 3000
+	GoSub WaitM
+	
+	
 	Send ^t
 	Send ^0
 	Defaults(True)
