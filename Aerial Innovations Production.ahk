@@ -22,9 +22,7 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-InitializeVariables() { ; Create mostly-static global variables
-	global ; create all these variables with global scope
-	
+InitializeVariables() {
 	; Run Functions and Timed Events
 	gosub Backups
 	gosub TitleblockFilenames
@@ -46,10 +44,15 @@ ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for 
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
 	MsgBox,,Simple loop using "A_Index", % "Item: " A_Index " has the Value of: " ArrayVar[A_Index]
 }
-PsBatch(SetNumber,ActionNumber){ ; Automatically Navigate the Photoshop Batch processes GUI
+PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the Photoshop Batch processes GUI
+	gosub WaitM
+	If (FromBridge = true) {
+		gosub BridgeBatch
+	}
+	else {
+		Send ^b
+	}
 	WinWaitActive ahk_class PSFloatC
-	If BrBatch = 0
-		GoSub BlockAllInput
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
 	Send {Down %SetNumber%}
@@ -57,7 +60,7 @@ PsBatch(SetNumber,ActionNumber){ ; Automatically Navigate the Photoshop Batch pr
 	Send {Down %ActionNumber%}
 	Send {Enter}
 	Defaults()
-}
+	}
 PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop SaveAs GUI
 	global
 	GoSub FlightDateValidate
@@ -134,14 +137,11 @@ Wait(Seconds) { ;creating a new syntax for pausing in AHK
 ; Substrings
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 BlockAllInput:
-	If BrBatchRun = 0
-	{
-		BlockInput, On
-		BlockInput, MouseMove
-		CoordMode, Mouse, Screen
-		MouseGetPos, MouseX, MouseY
-		MouseMove, 10000, 510
-	}
+	BlockInput, On
+	BlockInput, MouseMove
+	CoordMode, Mouse, Screen
+	MouseGetPos, MouseX, MouseY
+	MouseMove, 10000, 510
 	Return
 DateParse:
 	StringMid, YYYY, YYYYMMDD,1,4
@@ -215,15 +215,13 @@ FlightDateValidate:
 	If FlightDateRaw =
 		GoSub FlightDateInput
 	Return
-BrBatch:
-	GoSub BlockAllInput
-	GoSub WaitL
+BridgeBatch:
+	GoSub WaitXL
 	Send {Alt}
 	Send TP{Enter}
 	WinWaitActive, ahk_class #32770, , .3
 	If !ErrorLevel
 		Send !y
-	BrBatchRun := "1"
 	Return
 WaitXXXS:
 	Sleep 1
@@ -247,11 +245,10 @@ WaitXL:
 	Sleep 1000
 	Return
 WaitXXL:
-	Sleep 1500
+	Sleep 2000
 	return
 WaitXXXL:
-	Sleep 5000
-	return
+	Sleep 3000
 Backups:
 	gosub, BackupAppdata
 	return
@@ -291,27 +288,21 @@ TitleblockFilenames:
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #IfWinActive ahk_class Bridge_WindowClass
 !F12:: ; 96 ppi TB/CR
-	GoSub BrBatch
 	PsBatch(3, 5)
 	Return
 !F11:: ; 96 ppi CR
-	GoSub BrBatch
 	PsBatch(3, 6)
 	Return
 !F10:: ; 96 ppi
-	GoSub BrBatch
 	PsBatch(3, 7)
 	Return
 !F8:: ; 300 ppi TB/CR to CD Folder
-	GoSub BrBatch
 	PsBatch(3, 2)
 	Return
 !F7:: ; 300 ppi CR to CD Folder
-	GoSub BrBatch
 	PsBatch(3, 3)
 	Return
 !p:: ; Basic action to edit in Photoshop
-	GoSub BrBatch
 	PsBatch(0, 0)
 	WinActivate, ahk_class CabinetWClass ahk_group groupTB
 	Return
@@ -326,63 +317,48 @@ $!n:: ; New large Main Browser Window resets workspace
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #IfWinActive ahk_group Photoshop
 +F12:: ; Captures tab title, stores file number & use PS action Flat/Sharp
-	;~ gosub BlockAllInput
-	WinMaximize, A
-	WinRestore, A
+	gosub BlockAllInput
+	;~ WinMaximize, A
+	;~ WinRestore, A
+	Send ^{Tab}
+	Send ^+{Tab}
 	SetTitleMatchMode 3
+	;~ IfWinNotActive, ahk_class OWL.DocumentWindow {
+		;~ MsgBox, , Filename Capture Failure, "When using Shift+F12, make sure you have Ctr+Tab'd 
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
+	MsgBox, ,pswindow name captured, %PsWinTitle%
+	GoSub WaitXXXL
+	Send {F2}
+	GoSub WaitXXXL
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
-	
-	Sleep 3000
-	;~ GoSub WaitXXXL
-	Send {F2}
-	
-	Sleep 3000
-	;~ GoSub WaitXXXL
-	Send !w
-	
-	
-	;~ Sleep 3000
-	
-	Send 1
-	
-	;~ Sleep 3000
-	GoSub WaitL
+	Send !w1
+	GoSub WaitXL
 	Send ^+{tab}
-	
-	;~ Sleep 3000
-	GoSub WaitL
+	GoSub WaitXL
 	Send +{F2}
-	
-	;~ Sleep 3000
-	GoSub WaitM
-	
-	
+	GoSub WaitS
 	Send ^t
 	Send ^0
 	Defaults(True)
 	MouseMove, 1307, 937
 	Return
-^+F9:: ; Flatten and save to Temp
-	Send ^b
-	PsBatch(3, 1)
+^+F11:: ; Flattten, sharpen, and save to Temp
+	PsBatch(3, 0, false)
 	WinActivate, Temp ahk_class Bridge WindowClass
 	Return
 ^+F10:: ; Save As automation for TB images
 	;~ PsSaveAs("Y:\","Address: Y:\")
 	PsSaveAs("C:\Users\WS2\Desktop\Temp", "Address: C:\Users\WS2\Desktop\Temp")
 	Return
-^+F8:: ; Flatten and Save over
-	Send ^b
-	PsBatch(2, 0)
-	Return
-^+F7:: ; Flattten, sharpen, and save to Temp
-	Send ^b
-	PsBatch(3, 0)
+^+F9:: ; Flatten and save to Temp
+	PsBatch(3, 1, false)
 	WinActivate, Temp ahk_class Bridge WindowClass
+	Return
+^+F8:: ; Flatten and Save over
+	PsBatch(2, 0, false)
 	Return
 ~$^!w:: ; Auto close all Photoshop windows
 	WinWaitActive ahk_class #32770
@@ -452,19 +428,14 @@ $!n:: ; New large Main Browser Window resets workspace
 	}
 	SetTitleMatchMode 1
 	SetTitleMatchMode Fast
+	
 	If WinExist("Hightail" ahk_class YsiMainWindow)
 	{}
 	Else Run, %Hightail%
+	Run, %Email%
 	If WinExist("Zenfolio")
 	{}
 	Else Run, %Zenfolio%
-	;~ If WinExist(ahk_group EmailClient)
-	;~ {MsgBox,,, Email is active
-		;~ GroupActivate, EmailClient
-	;~ }
-	;~ Else Run, %Email%
-	;~ Run, %Zenfolio%
-	Run, %Email%
 	Defaults()
 	return
 	
@@ -475,7 +446,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	SendInput %MMMM% %DD%, %YYYY%
 	If winactive("Hightail" ahk_class YsiMainWindow){
 		SendInput {Tab}
-		gosub WaitXS
+		gosub WaitM
 		SendInput %emailSigAerialPhotos%%userName%{Enter}
 		gosub WaitS
 		WinActivate, CD Folder
@@ -535,6 +506,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	MsgBox, , Window Parse Complete, %id% windows parsed.
 	Defaults()
 	Return
+	
 ^!NumpadAdd:: ; cycle though all windows for debugging
 	WinGetAll(False, True)
 	Return
