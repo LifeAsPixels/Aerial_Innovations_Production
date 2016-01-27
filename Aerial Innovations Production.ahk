@@ -318,13 +318,10 @@ $!n:: ; New large Main Browser Window resets workspace
 #IfWinActive ahk_group Photoshop
 +F12:: ; Captures tab title, stores file number & use PS action Flat/Sharp
 	gosub BlockAllInput
-	;~ WinMaximize, A
-	;~ WinRestore, A
 	Send ^{Tab}
+	gosub WaitS
 	Send ^+{Tab}
 	SetTitleMatchMode 3
-	;~ IfWinNotActive, ahk_class OWL.DocumentWindow {
-		;~ MsgBox, , Filename Capture Failure, "When using Shift+F12, make sure you have Ctr+Tab'd 
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
