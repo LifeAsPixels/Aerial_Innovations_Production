@@ -44,6 +44,7 @@ ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for 
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
 	MsgBox,,Simple loop using "A_Index", % "Item: " A_Index " has the Value of: " ArrayVar[A_Index]
 }
+<<<<<<< HEAD
 PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the Photoshop Batch processes GUI
 	gosub WaitM
 	If (FromBridge = true) {
@@ -53,6 +54,17 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 		Send ^b
 	}
 	WinWaitActive ahk_class PSFloatC
+=======
+PsBatch(SetNumber,ActionNumber, FromBridge = true){ ; Automatically Navigate the Photoshop Batch processes GUI
+	WinWaitActive ahk_class PSFloatC
+	gosub WaitM
+	If FromBridge = true {
+		gosub BridgeBatch
+	}
+	else {
+		Send ^b
+	}
+>>>>>>> origin/master
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
 	Send {Down %SetNumber%}
@@ -216,7 +228,12 @@ FlightDateValidate:
 		GoSub FlightDateInput
 	Return
 BridgeBatch:
+<<<<<<< HEAD
 	GoSub WaitXL
+=======
+	GoSub BlockAllInput
+	GoSub WaitL
+>>>>>>> origin/master
 	Send {Alt}
 	Send TP{Enter}
 	WinWaitActive, ahk_class #32770, , .3
