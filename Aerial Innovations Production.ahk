@@ -45,7 +45,6 @@ ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for 
 	MsgBox,,Simple loop using "A_Index", % "Item: " A_Index " has the Value of: " ArrayVar[A_Index]
 }
 PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the Photoshop Batch processes GUI
-	WinWaitActive ahk_class PSFloatC
 	gosub WaitM
 	If (FromBridge = true) {
 		gosub BridgeBatch
