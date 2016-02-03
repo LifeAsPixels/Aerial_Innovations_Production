@@ -21,6 +21,10 @@ GroupAdd, EmailClient, E-mail and Online Storage
 ; Webpages
 Email := "https://email.1and1.com/appsuite/"
 Zenfolio := "http://www.zenfolio.com/flyga/e/all-photos.aspx"
+Asana := "https://app.asana.com"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Local Arrays
 AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
+
+; Folders
+folderArchivesTemp := "Z:\Archives\Temp"

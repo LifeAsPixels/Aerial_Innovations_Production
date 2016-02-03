@@ -31,7 +31,7 @@ InitializeVariables() {
 	RunProgram("ahk_exe Bridge.exe", Bridge)
 	
 	Defaults(True)
-	MsgBox, ,Startup Complete, Startup Complete
+	MsgBox, ,Startup Complete, Aerial Innovations Production Code Startup is Complete
 }
 
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
@@ -437,7 +437,9 @@ $!n:: ; New large Main Browser Window resets workspace
 	If WinExist("Zenfolio")
 	{}
 	Else Run, %Zenfolio%
+	Run, %Asana%
 	Defaults()
+	
 	return
 	
 ^+a:: ; Send email signature with variable date based on the flight date
@@ -511,7 +513,7 @@ $!n:: ; New large Main Browser Window resets workspace
 ^!NumpadAdd:: ; cycle though all windows for debugging
 	WinGetAll(False, True)
 	Return
-^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
+^!+F1:: ; Most all files from curerntly selected folders into %folderArchivesTemp% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
 	For i, value in FolderPath
