@@ -345,7 +345,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	Send !w1
-	GoSub WaitS
+	GoSub WaitM
 	Send ^+{tab}
 	GoSub WaitL
 	Send +{F2}
