@@ -32,7 +32,7 @@ InitializeVariables() {
 	RunProgram("ahk_exe Bridge.exe", Bridge)
 	
 	Defaults(True)
-	MsgBox, ,Startup Complete, Startup Complete
+	MsgBox, ,Startup Complete, Aerial Innovations Production Code Startup is Complete
 }
 
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
@@ -54,15 +54,7 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 		Send ^b
 	}
 	WinWaitActive ahk_class PSFloatC
-PsBatch(SetNumber,ActionNumber, FromBridge = true){ ; Automatically Navigate the Photoshop Batch processes GUI
-	WinWaitActive ahk_class PSFloatC
-	gosub WaitM
-	If FromBridge = true {
-		gosub BridgeBatch
-	}
-	else {
-		Send ^b
-	}
+	gosub WaitS
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
 	Send {Down %SetNumber%}
@@ -119,7 +111,7 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 	While WinActive(PsFilename) = 0
 	{
 		if (A_Index = 1){
-			gosub WaitS
+			gosub WaitM
 		}
 		SendEvent ^{Tab}
 		gosub WaitS
@@ -349,7 +341,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Send ^+{tab}
 	GoSub WaitL
 	Send +{F2}
-	GoSub WaitS
+	GoSub WaitM
 	Send ^t
 	Send ^0
 	Defaults(True)
@@ -446,7 +438,9 @@ $!n:: ; New large Main Browser Window resets workspace
 	If WinExist("Zenfolio")
 	{}
 	Else Run, %Zenfolio%
+	Run, %Asana%
 	Defaults()
+	
 	return
 	
 ^+a:: ; Send email signature with variable date based on the flight date
@@ -520,7 +514,7 @@ $!n:: ; New large Main Browser Window resets workspace
 ^!NumpadAdd:: ; cycle though all windows for debugging
 	WinGetAll(False, True)
 	Return
-^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
+^!+F1:: ; Most all files from curerntly selected folders into %folderArchivesTemp% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
 	For i, value in FolderPath
