@@ -32,7 +32,7 @@ InitializeVariables() {
 	RunProgram("ahk_exe Bridge.exe", Bridge)
 	
 	Defaults(True)
-	MsgBox, ,Startup Complete, Aerial Innovations Production Code Startup is Complete
+	MsgBox, ,Startup Complete, Startup Complete
 }
 
 titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
@@ -54,7 +54,6 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 		Send ^b
 	}
 	WinWaitActive ahk_class PSFloatC
-	gosub WaitS
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
 	Send {Down %SetNumber%}
@@ -111,7 +110,7 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 	While WinActive(PsFilename) = 0
 	{
 		if (A_Index = 1){
-			gosub WaitM
+			gosub WaitS
 		}
 		SendEvent ^{Tab}
 		gosub WaitS
@@ -119,13 +118,13 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 	SendEvent ^{Tab}
 	Defaults()
 }
-RunProgram(WinTitle, FilePath) { ; Run a program only if it isn't already running
-	SetTitleMatchMode, 2 ; approximate match
+RunProgram(WinTitle, FilePath, TitleMode = 1, WaitForProgram = false) { ; Run a program only if it isn't already running
+		SetTitleMatchMode = TitleMode
 	IfWinExist, %WinTitle%
 		WinActivate, %WinTitle%
 	else
-	{
 		Run, %FilePath%
+	If (WaitForProgram) {
 		WinWaitActive, %WinTitle%
 	}
 }
@@ -219,8 +218,6 @@ FlightDateValidate:
 	Return
 BridgeBatch:
 	GoSub WaitXL
-	GoSub BlockAllInput
-	GoSub WaitL
 	Send {Alt}
 	Send TP{Enter}
 	WinWaitActive, ahk_class #32770, , .3
@@ -249,7 +246,7 @@ WaitXL:
 	Sleep 1000
 	Return
 WaitXXL:
-	Sleep 2000
+	Sleep 1500
 	return
 WaitXXXL:
 	Sleep 3000
@@ -333,15 +330,15 @@ $!n:: ; New large Main Browser Window resets workspace
 	;~ MsgBox, ,pswindow name captured, %PsWinTitle%
 	GoSub WaitXL
 	Send {F2}
-	GoSub WaitXL
+	GoSub WaitXXL
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	Send !w1
-	GoSub WaitM
+	GoSub WaitS
 	Send ^+{tab}
 	GoSub WaitL
 	Send +{F2}
-	GoSub WaitM
+	GoSub WaitS
 	Send ^t
 	Send ^0
 	Defaults(True)
@@ -428,19 +425,11 @@ $!n:: ; New large Main Browser Window resets workspace
 		Temp := ""
 		gosub WaitS
 	}
-	SetTitleMatchMode 1
-	SetTitleMatchMode Fast
-	
-	If WinExist("Hightail" ahk_class YsiMainWindow)
-	{}
-	Else Run, %Hightail%
-	Run, %Email%
-	If WinExist("Zenfolio")
-	{}
-	Else Run, %Zenfolio%
-	Run, %Asana%
+	RunProgram("Hightail ahk_class YsiMainWindow", Hightail)
+	RunProgram("1&1 Mail Business", Email)
+	RunProgram("Zenfolio", Zenfolio)
+	RunProgram("Asana", Asana)
 	Defaults()
-	
 	return
 	
 ^+a:: ; Send email signature with variable date based on the flight date
@@ -514,7 +503,7 @@ $!n:: ; New large Main Browser Window resets workspace
 ^!NumpadAdd:: ; cycle though all windows for debugging
 	WinGetAll(False, True)
 	Return
-^!+F1:: ; Most all files from curerntly selected folders into %folderArchivesTemp% then moves the folder to a temp backup location
+^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
 	For i, value in FolderPath
