@@ -24,19 +24,24 @@ Script Function	---
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 InitializeVariables() {
+	global
 	; Run Functions and Timed Events
 	gosub Backups
-	gosub TitleblockFilenames
-	titleblockFolderGroup()
-	RunProgram("ahk_exe Photoshop.exe", Photoshop) 
-	RunProgram("ahk_exe Bridge.exe", Bridge)
-	
+	TitleblockFolderGroup()
 	Defaults(True)
 	MsgBox, ,Startup Complete, Startup Complete
 }
-
-titleblockFolderGroup(){ ; Sets all folders inside defined root folder as part of a group for variably accessing an explorer window
+TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, add them to window group
 	global
+	Filelist := ""
+	Loop , %folderTitleBlocks%*.psd, 0, 1
+	{
+		LoopFileShortNameNoExt := RegExReplace(A_LoopFileName, regexRemovePSD, "$1")
+		Filelist = %Filelist%%LoopFileShortNameNoExt%`n
+	}
+	Sort, Filelist, U
+	FileDelete, %folderShawnDocs%AI Titleblocks.csv
+	FileAppend, %Filelist%, %folderShawnDocs%AI Titleblocks.csv
 	GroupAdd, groupTB, _Titleblock Templates
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
@@ -120,10 +125,15 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 }
 RunProgram(WinTitle, FilePath, TitleMode = 1, WaitForProgram = false) { ; Run a program only if it isn't already running
 		SetTitleMatchMode = TitleMode
+		MsgBox,,debug, %WinTitle%`n%FilePath%
 	IfWinExist, %WinTitle%
+	{
 		WinActivate, %WinTitle%
+	}
 	else
+	{
 		Run, %FilePath%
+	}
 	If (WaitForProgram) {
 		WinWaitActive, %WinTitle%
 	}
@@ -273,17 +283,6 @@ BackupAppdata:
 	; schedule "BackupAppdata" to run again tomorrow at the same time
 	SetTimer, Backups, 86400000
 	return
-TitleblockFilenames:
-	Filelist := ""
-	Loop , %folderTitleBlocks%*.psd, 0, 1
-	{
-		LoopFileShortNameNoExt := RegExReplace(A_LoopFileName, regexRemovePSD, "$1")
-		Filelist = %Filelist%%LoopFileShortNameNoExt%`n
-	}
-	Sort, Filelist, U
-	FileDelete, %folderShawnDocs%AI Titleblocks.csv
-	FileAppend, %Filelist%, %folderShawnDocs%AI Titleblocks.csv
-	return
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Adobe Bridge Shortcuts
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -425,6 +424,8 @@ $!n:: ; New large Main Browser Window resets workspace
 		Temp := ""
 		gosub WaitS
 	}
+	RunProgram("ahk_exe Photoshop.exe", Photoshop)
+	RunProgram("ahk_exe Bridge.exe", Bridge)
 	RunProgram("Hightail ahk_class YsiMainWindow", Hightail)
 	RunProgram("1&1 Mail Business", Email)
 	RunProgram("Zenfolio", Zenfolio)

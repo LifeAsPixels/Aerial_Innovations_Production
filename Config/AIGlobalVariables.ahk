@@ -11,6 +11,10 @@ regexRemovePSD := "^(.+?)\.psd$"
 ; File Patterns
 BackupFilePattern := "\*.*"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Folders
+folderArchives := "Z:\Archives\Temp\"
+folderTitleBlocks := "Z:\_Titleblock Templates\"
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Window Groups
 GroupAdd, Photoshop, ahk_class Photoshop
 GroupAdd, Photoshop, ahk_class OWL.DocumentWindow
@@ -25,9 +29,8 @@ Asana := "https://app.asana.com"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Local Arrays
 AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
-; Folders
-folderArchivesTemp := "Z:\Archives\Temp"
-; Email messages:
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Email messages
 ;~ emailSigProgressEnding := "I was looking at the aerial photo order for this job and saw that it may be ending soon. Do you have an update for us in regards to how much longer you need it photographed?"
 ;~ emailSigAerialPhotos := "Thank you. Have a wonderful day!"{!}{Enter}-{Space}
 ;~ emailSigTitleblockApproval := "The draft title block for this project is attached. Please let us know if this looks good or if any changes need to be made."{Enter}Thanks{!}{Enter}
