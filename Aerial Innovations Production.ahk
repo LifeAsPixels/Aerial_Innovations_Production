@@ -27,8 +27,8 @@ InitializeVariables() {
 	gosub Backups
 	gosub TitleblockFilenames
 	titleblockFolderGroup()
-	RunProgram("ahk_exe Photoshop.exe", Photoshop) 
-	RunProgram("ahk_exe Bridge.exe", Bridge)
+	;~ RunProgram("ahk_exe Photoshop.exe", Photoshop) 
+	;~ RunProgram("ahk_exe Bridge.exe", Bridge)
 	
 	Defaults(True)
 	MsgBox, ,Startup Complete, Startup Complete
@@ -64,7 +64,7 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop SaveAs GUI
 	global
 	GoSub FlightDateValidate
-	gosub WaitS
+	gosub WaitM
 	SendInput ^+s
 	WinWaitActive ahk_class #32770
 	SetTitleMatchMode 3
@@ -220,7 +220,9 @@ FlightDateValidate:
 BridgeBatch:
 	GoSub WaitXL
 	Send {Alt}
+	gosub WaitS
 	Send TP{Enter}
+	gosub WaitS
 	WinWaitActive, ahk_class #32770, , .3
 	If !ErrorLevel
 		Send !y
@@ -393,9 +395,8 @@ $!n:: ; New large Main Browser Window resets workspace
 	Return
 ^NumpadAdd:: ; Set active window as TB window similar to +F12
 	Send ^{Tab}
-	Gosub WaitS
 	Send ^+{Tab}
-	Gosub WaitS
+	Gosub WaitM
 	WinGetActiveTitle, WinName
 	TBFilenamePrefix := RegExReplace(WinName,regexPStabTB,"$1")
 	MsgBox,,Titel Block Window, The TB Window is:`n%WinName%`n`nThe prefix is:`n%TBFilenamePrefix%
