@@ -8,7 +8,7 @@ user2 := "Meredith"
 pc1 := "WS1"
 pc2 := "WS2"
 
-return
+;~ return
 
 ; GUI
 iniLoad(){
@@ -59,6 +59,6 @@ AIhudupdate(){
  ;~ Run, %A_ScriptFullPath%
  ;~ ExitApp
 
-^!+1::
-AIguiStart()
-return
+;~ ^!+1::
+;~ AIguiStart()
+;~ return

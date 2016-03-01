@@ -25,10 +25,9 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+; Run Functions and Timed Events
 InitializeVariables() {
 	global
-	; Run Functions and Timed Events
 	gosub Backups
 	TitleblockFolderGroup()
 	Defaults(True)
