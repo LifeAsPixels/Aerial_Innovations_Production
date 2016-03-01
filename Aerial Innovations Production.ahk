@@ -16,13 +16,16 @@ Script Function	---
 	#Include Library\Get_Explorer_Paths.ahk ; Library - gets explorer file and window paths
 	#include Library\Defaults.ahk
 	#include Library\WinGetAll.ahk
+	#include Library\AerialInnovationsGUI.ahk
 	#include Config\AIGlobalVariables.ahk
 	#include Config\AIUserVariables.ahk
+	;~ #include Library\AerialInnovationsGUI.ahk
 	InitializeVariables()
 	Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 InitializeVariables() {
 	global
 	; Run Functions and Timed Events
@@ -45,6 +48,7 @@ TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, a
 	GroupAdd, groupTB, _Titleblock Templates
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
+	FileList := ""
 }
 ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for debugging
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
@@ -70,6 +74,7 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop SaveAs GUI
 	global
 	GoSub FlightDateValidate
+	gosub WaitS
 	SendInput ^+s
 	WinWaitActive ahk_class #32770
 	SetTitleMatchMode 3
@@ -125,7 +130,6 @@ PsSaveAs(PsDirectory,PsWindowAttribute) { ; Automatically navigate the Photoshop
 }
 RunProgram(WinTitle, FilePath, TitleMode = 1, WaitForProgram = false) { ; Run a program only if it isn't already running
 		SetTitleMatchMode = TitleMode
-		MsgBox,,debug, %WinTitle%`n%FilePath%
 	IfWinExist, %WinTitle%
 	{
 		WinActivate, %WinTitle%
@@ -335,7 +339,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Send !w1
 	GoSub WaitS
 	Send ^+{tab}
-	GoSub WaitL
+	GoSub WaitXL
 	Send +{F2}
 	GoSub WaitS
 	Send ^t
@@ -546,6 +550,7 @@ $!n:: ; New large Main Browser Window resets workspace
 			FileMoveDir, % FolderPath[A_Index], %folderNASRecycle%%CurrentTime%%RootDir%, 1
 		}
 	}
+	FileList := ""
 	MsgBox,,, Backup Complete
 	return
 	
