@@ -543,8 +543,8 @@ $!n:: ; New large Main Browser Window resets workspace
 			FileMove, %A_LoopField%, %folderArchivesTemp%, 1
 			If ErrorLevel != 0 
 			{
-				MsgBox,,, Could not move %A_LoopField% into %DestinationFolder%. `n ErrorLevel is %ErrorLevel%
-				LogInput := %LogInput%%A_LoopField%`n
+				MsgBox,,, Could not move %A_LoopField% into %folderArchivesTemp%. `n ErrorLevel is %ErrorLevel%
+				LogInput = %LogInput%%A_LoopField%`n
 			}
 		}
 		If LogInput !=

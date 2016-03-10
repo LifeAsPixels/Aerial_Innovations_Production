@@ -1,4 +1,5 @@
 ; RegEx Variables
+
 regexOrigFilename := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
 regexPStabTB := "^(.+?)(\.\w{1,4})(.+)$"
@@ -12,7 +13,7 @@ regexRemovePSD := "^(.+?)\.psd$"
 BackupFilePattern := "\*.*"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Folders
-folderArchives := "Z:\Archives\Temp\"
+folderArchivesTemp := "Z:\Archives\Temp\"
 folderTitleBlocks := "Z:\_Titleblock Templates\"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Window Groups
