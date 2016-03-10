@@ -16,7 +16,7 @@ Script Function	---
 	#Include Library\Get_Explorer_Paths.ahk ; Library - gets explorer file and window paths
 	#include Library\Defaults.ahk
 	#include Library\WinGetAll.ahk
-	#include Library\AerialInnovationsGUI.ahk
+	;~ #include Library\AerialInnovationsGUI.ahk
 	#include Config\AIGlobalVariables.ahk
 	#include Config\AIUserVariables.ahk
 	;~ #include Library\AerialInnovationsGUI.ahk
@@ -507,6 +507,7 @@ $!n:: ; New large Main Browser Window resets workspace
 ^!NumpadAdd:: ; cycle though all windows for debugging
 	WinGetAll(False, True)
 	Return
+	
 ^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
 	FolderPath := Array()
@@ -537,8 +538,8 @@ $!n:: ; New large Main Browser Window resets workspace
 			FileMove, %A_LoopField%, %folderArchivesTemp%, 1
 			If ErrorLevel != 0 
 			{
-				MsgBox,,, Could not move %A_LoopField% into %DestinationFolder%. `n ErrorLevel is %ErrorLevel%
-				LogInput := %LogInput%%A_LoopField%`n
+				MsgBox,,, Could not move %A_LoopField% into %folderArchivesTemp%. `n ErrorLevel is %ErrorLevel%
+				LogInput = %LogInput%%A_LoopField%`n
 			}
 		}
 		If LogInput !=
@@ -549,7 +550,6 @@ $!n:: ; New large Main Browser Window resets workspace
 			FileMoveDir, % FolderPath[A_Index], %folderNASRecycle%%CurrentTime%%RootDir%, 1
 		}
 	}
-	FileList := ""
 	MsgBox,,, Backup Complete
 	return
 	

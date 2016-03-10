@@ -12,11 +12,15 @@ pc2 := "WS2"
 
 ; GUI
 iniLoad(){
+ IniRead, 
+ 
 ; read through user ini file and set variables
 
 ; read through pc ini file and set variabls
 }
-
+iniSave(){
+ 
+}
 AIguiStart(){
  global
  

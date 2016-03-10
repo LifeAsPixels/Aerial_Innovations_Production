@@ -12,7 +12,7 @@ regexRemovePSD := "^(.+?)\.psd$"
 BackupFilePattern := "\*.*"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Folders
-folderArchives := "Z:\Archives\Temp\"
+folderArchivesTemp := "Z:\Archives\Temp\"
 folderTitleBlocks := "Z:\_Titleblock Templates\"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Window Groups

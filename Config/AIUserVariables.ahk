@@ -14,6 +14,6 @@ folderNASRecycle := "Z:\Shawn\Backups\Recycle\"
 ProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates", "Z:\Shawn\Aerial_Innovations_Production"	]
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-userName := "Meredith"
+userName := "Shawn"
 emailSigAerialPhotos = Thank you. Have a wonderful day{!}{Enter}-{Space}
 emailSigTitleblockApproval = The draft title block for this project is attached. Please let us know if this looks good or if any changes need to be made.{Enter}Thanks{!}{Enter}
