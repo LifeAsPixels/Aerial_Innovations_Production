@@ -10,29 +10,144 @@ Script Function	---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Auto Execute Section, Default Variables, RegEx Variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	Menu, Tray, Icon, AerialInnovations.ico
 	#SingleInstance force ; Forces a single instance when trying to reopen script
 	#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
 	SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
 	#Include Library\Get_Explorer_Paths.ahk ; Library - gets explorer file and window paths
 	#include Library\Defaults.ahk
 	#include Library\WinGetAll.ahk
-	;~ #include Library\AerialInnovationsGUI.ahk
 	#include Config\AIGlobalVariables.ahk
-	#include Config\AIUserVariables.ahk
-	;~ #include Library\AerialInnovationsGUI.ahk
+	
+	user1 := "Meredith"
+	user2 := "Shawn"
+	pc1 := "WS01"
+	pc2 := "WS02"
+	
 	InitializeVariables()
 	Return
+InitializeVariables() {
+	global
+	Defaults(True)
+	AIguiStart()
+	gosub Backups
+	TitleblockFolderGroup()
+
+	;~ MsgBox, ,Startup Complete, Startup Complete
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;		GUI
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Run Functions and Timed Events
+; GUI
+AIguiStart(){ ; Load GUI for user, workstation, and flight date variable capture
+	global
+	If WinName =
+		WinGetActiveTitle, WinName
+	Gui, AIProdConfig: New, +AlwaysOnTop +DPIScale -SysMenu, Aerial Innovations Settings
+	Gui, Add, Text, x10 y10, Select user:
+	Gui, Add, DropDownList, x10 y30 w200 Choose1 vUserChoice, %user1%|%user2%
+	Gui, Add, Text, x10 y60, Select work station:
+	Gui, Add, DropDownList, x10 y80 w200 Choose1 vWorkStationChoice, %pc1%|%pc2%
+	Gui, Add, Text, x10 y110, Input Flight Date using YYMMDD:
+	Gui, Add, Edit,  x10 y130 w200 vFlightDateRaw
+	Gui, Add, Button, gButtonCancel x10 y160 w50, Close
+	Gui, Add, Button, gButtonOK Default x160 y160 w50, OK
+	Gui, Show
+	return
+}
+AIhudStart(){ ; Load GUI HUD that displays currently active user variables
+Gui, +E0x20 +AlwaysOnTop +Disabled -SysMenu +Owner
+}
+SetUserVariables(AIUser) { ; switch that sets user variables from the GUI
+	global
+	if (AIUser = "Shawn") {
+		userFolderNetworkDocuments := "Z:\Shawn\Docs\"
+		userFolderNetworkBackups := "Z:\Shawn\Backups\"
+		userFolderNetworkRecycle := "Z:\Shawn\Backups\Recycle\"
+		userProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates", "Z:\Shawn\Aerial_Innovations_Production"]
+		userName := "Shawn"
+		return local AIUser
+	}
+	else if (AIUser = "Meredith") {
+		userFolderNetworkDocuments := "Z:\Meredith\Docs\"
+		userFolderNetworkBackups := "Z:\Meredith\Backups\"
+		userFolderNetworkRecycle := "Z:\Meredith\Backups\Recycle\"
+		userProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates"]
+		userName := "Meredith"
+		return local AIUser
+	}
+	else {
+		return false
+	}
+}
+SetWorkStationVariables(Workstation) { ; switch that sets work station variables from the GUI
+	global
+	if (Workstation = "WS01") {
+		Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
+		Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
+		Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
+		folderDesktopTemp := "C:\Users\Laura\Desktop\Temp"
+		WorkstationName := "WS01"
+		return local Workstation
+	}
+	else if (Workstation = "WS02") {
+		Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
+		Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
+		Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
+		folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
+		WorkstationName := "WS02"
+		return local Workstation
+	}
+	else 
+		return false
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;		GUI Default Actions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+GuiEscape:
+GuiClose:
+Cancel:
+ButtonCancel:
+	Gui, Destroy
+	return
+OK:
+ButtonOK:
+	Gui, Submit  ; Save the input from the user to each control's associated variable.
+	SetUserVariablesSuccess := SetUserVariables(UserChoice)
+	SetWorkStationVariablesSuccess := SetWorkStationVariables(WorkStationChoice)
+	FlightDateInputSuccess := FlightDateInput(FlightDateRaw)
+	If (FlightDateInputSuccess and SetUserVariablesSuccess and FlightDateInputSuccess){
+		GoSub DateParse
+		MsgBox,6,Settings Input Success,
+				(LTrim
+				You entered: 
+				User: %UserChoice%
+				PC: %WorkStationChoice%
+				Date: %FlightDateRaw%
+				
+				Dates:
+				Standard format: %MMMM% %DD%, %YYYY%
+				Titleblock: %MMM% %DD% %YYYY%
+				Folder Tree: %YYMMDD%
+			)
+		IfMsgBox TryAgain
+			AIguiStart()
+		IfMsgBox Cancel
+			Exit
+		}
+		MsgBox, ,Startup Complete, Startup Complete
+			;~ IfMsgBox OK {
+				;~ Exit
+				;~ SetTitleMatchMode Fast
+				;~ SetTitleMatchMode 1
+				;~ WinActivate, %WinName%
+				;~ WinName := ""
+		}
+	return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Run Functions and Timed Events
-InitializeVariables() {
-	global
-	gosub Backups
-	TitleblockFolderGroup()
-	Defaults(True)
-	MsgBox, ,Startup Complete, Startup Complete
-}
 TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, add them to window group
 	global
 	Filelist := ""
@@ -42,8 +157,8 @@ TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, a
 		Filelist = %Filelist%%LoopFileShortNameNoExt%`n
 	}
 	Sort, Filelist, U
-	FileDelete, %folderShawnDocs%AI Titleblocks.csv
-	FileAppend, %Filelist%, %folderShawnDocs%AI Titleblocks.csv
+	FileDelete, %userFolderNetworkDocuments%AI Titleblocks.csv
+	FileAppend, %Filelist%, %userFolderNetworkDocuments%AI Titleblocks.csv
 	GroupAdd, groupTB, _Titleblock Templates
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
@@ -179,10 +294,9 @@ DateParse:
 	FormatTime, MMMM, 2015%MM%21, MMMM
 	StringUpper, MMM, MMMLower
 	Return
-FlightDateInput:
-	If WinName =
-		WinGetActiveTitle, WinName
-	InputBox, FlightDateRaw, Input Flight Date, Input date using format YYMMDD, , 320, 240
+FlightDateInput(FlightDateRaw) {
+	global
+	;~ InputBox, FlightDateRaw, Input Flight Date, Input date using format YYMMDD, , 320, 240
 	If (RegExMatch(FlightDateRaw, regexDate8Digit) = 1 or RegExMatch(FlightDateRaw, regexDate6Digit) = 1)
 	{
 		If RegExMatch(FlightDateRaw, regexDate8Digit) = 1
@@ -190,44 +304,14 @@ FlightDateInput:
 		If RegExMatch(FlightDateRaw, regexDate6Digit) = 1
 			YYMMDD := FlightDateRaw
 		YYYYMMDD := "20" . YYMMDD
-	}
-	Else ErrorLevel := 1
-	If ErrorLevel
-	{
-		MsgBox, 5, Flight Date Input Failure, 
-		(LTrim
-			You have not entered a valid flight date.
-			Would you like to Retry or Cancel the operation?
-		)
-		IfMsgBox Retry
-			GoSub FlightDateInput
-		Else
-			Exit
-		Return
+		return YYMMDD
 	}
 	Else
-	{
-		GoSub DateParse
-		MsgBox, 6, Flight Date Input Success,
-		(LTrim
-			You entered: %FlightDateRaw%
-			Standard format: %MMMM% %DD%, %YYYY%
-			Titleblock: %MMM% %DD% %YYYY%
-			Folder Tree: %YYMMDD%
-		)
-		IfMsgBox TryAgain
-			GoSub FlightDateInput
-		IfMsgBox Cancel
-			Exit
-	}
-	SetTitleMatchMode Fast
-	SetTitleMatchMode 1
-	WinActivate, %WinName%
-	WinName := ""
-	Return
+		return false
+}
 FlightDateValidate:
 	If FlightDateRaw =
-		GoSub FlightDateInput
+		AIGuiStart()
 	Return
 BridgeBatch:
 	GoSub WaitXL
@@ -270,15 +354,15 @@ BackupAppdata:
 	FormatTime, BackupDate, ,yyyyMMdd
 	For i, value in AppDataBackups
 	{
-		IfExist, %folderShawnBackups%%BackupDate%%value%
+		IfExist, %userFolderNetworkBackups%%BackupDate%%value%
 			continue
-		FileCopyDir, %A_Appdata%%value%, %folderShawnBackups%%BackupDate%%value%, 1
+		FileCopyDir, %A_Appdata%%value%, %userFolderNetworkBackups%%BackupDate%%value%, 1
 	}
 	; Delete all folders in the backups folder dated older than 31 days
 	CurrentTime := 
 	EnvAdd, CurrentTime,  -31, days
 	FormatTime, CurrentTime, %CurrentTime%, yyMMdd
-	Loop, %folderShawnBackups%*, 2, 0
+	Loop, %userFolderNetworkBackups%*, 2, 0
 	{
 		If (A_LoopFileName < CurrentTime and RegExMatch(A_LoopFileName, regexDate6Digit))
 			FileRemoveDir, %A_LoopFileLongPath%, 1
@@ -352,7 +436,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Return
 ^+F10:: ; Save As automation for TB images
 	;~ PsSaveAs("Y:\","Address: Y:\")
-	PsSaveAs("C:\Users\WS2\Desktop\Temp", "Address: C:\Users\WS2\Desktop\Temp")
+	PsSaveAs(folderDesktopTemp, "Address: "folderDesktopTemp)
 	Return
 ^+F9:: ; Flatten and save to Temp
 	PsBatch(3, 1, false)
@@ -420,9 +504,9 @@ $!n:: ; New large Main Browser Window resets workspace
 		else
 			WinClose, ahk_class CabinetWClass
 	}
-	For i, value in ProdExplorer
+	For i, value in userProdExplorer
 	{
-		Temp := ProdExplorer[A_Index]
+		Temp := userProdExplorer[A_Index]
 		Run explore %Temp%
 		Temp := ""
 		gosub WaitS
@@ -463,7 +547,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	WinActivate, groupTB
 	return
 !NumpadDiv:: ; Input Flight Date variable
-	GoSub FlightDateInput
+	AIGuiStart()
 	Return
 ^NumpadSub:: ; List Variables
 	WinGetActiveTitle, PsWinTitleTB
@@ -471,7 +555,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	TBFilenamePrefix := RegExReplace(PsWinTitleTB, regexPStabTB,"$1",TBReplaceCount)
 	PsFilename := RegExReplace(PsWinTitle, RegExTabB,"$1$2$3")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle, regexOrigFilename,"$3")
-	ArrayPrint(ProdExplorer)
+	ArrayPrint(userProdExplorer)
 	ListVars
 	Return
 ^!NumpadSub:: ; get window testing show hidden PS files
@@ -547,11 +631,12 @@ $!n:: ; New large Main Browser Window resets workspace
 		else
 		{
 			RootDir := Regexreplace(FolderPath[A_Index], regexDir, "$2")
-			FileMoveDir, % FolderPath[A_Index], %folderNASRecycle%%CurrentTime%%RootDir%, 1
+			FileMoveDir, % FolderPath[A_Index], %userFolderNetworkRecycle%%CurrentTime%%RootDir%, 1
 		}
 	}
 	MsgBox,,, Backup Complete
 	return
 	
 ^!+F12::
-Send %emailSigAerialPhotos%
+AIguiStart()
+return
