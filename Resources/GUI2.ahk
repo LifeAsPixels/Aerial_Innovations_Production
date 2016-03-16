@@ -1,6 +1,5 @@
 #SingleInstance force
-SetWorkingDir %A_ScriptDir%
-
+return
 GUI1(){
 ; Example: A simple input-box that asks for first name and last name:
 
@@ -18,7 +17,7 @@ GuiClose:
 ButtonOK:
 Gui, Submit  ; Save the input from the user to each control's associated variable.
 MsgBox You entered "%FirstName% %LastName%".
-ExitApp
+gui destroy
 
 ^`:: ; Re-open this AHK script
 	Run, %A_ScriptFullPath%

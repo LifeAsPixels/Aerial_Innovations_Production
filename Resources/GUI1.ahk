@@ -1,6 +1,5 @@
 #SingleInstance force
-SetWorkingDir %A_ScriptDir%
-
+return
 ; Example: Achieve an effect similar to SplashTextOn:
 GUI1(){
 Gui, +AlwaysOnTop +Disabled -SysMenu +Owner  ; +Owner avoids a taskbar button.

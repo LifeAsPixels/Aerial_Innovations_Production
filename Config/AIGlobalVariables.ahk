@@ -1,3 +1,5 @@
+SysGet, Mon1, Monitor
+GUIHUDposY := Mon1Bottom-80
 ; RegEx Variables
 regexOrigFilename := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
@@ -29,6 +31,11 @@ Asana := "https://app.asana.com"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Local Arrays
 AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
+
+user1 := "Meredith"
+user2 := "Shawn"
+pc1 := "WS01"
+pc2 := "WS02"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Email messages
 

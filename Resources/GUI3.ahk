@@ -1,17 +1,31 @@
 #SingleInstance force
-SetWorkingDir %A_ScriptDir%
+return
+; Example: Tab control:
+; Example: Tab control:
+gui:
+Gui, Add, Tab2,, First Tab|Second Tab|Third Tab  ; Tab2 vs. Tab requires v1.0.47.05.
+Gui, Add, Checkbox, vMyCheckbox, Sample checkbox
+Gui, Tab, 2
+Gui, Add, Radio, vMyRadio, Sample radio1
+Gui, Add, Radio,, Sample radio2
+Gui, Tab, 3
+Gui, Add, Edit, vMyEdit r5  ; r5 means 5 rows tall.
+Gui, Tab  ; i.e. subsequently-added controls will not belong to the tab control.
+Gui, Add, Button, default xm, OK  ; xm puts it at the bottom left corner.
+Gui, Show
+return
 
-; Example: Achieve an effect similar to SplashTextOn:
-GUI1(){
-Gui, +AlwaysOnTop +Disabled -SysMenu +Owner  ; +Owner avoids a taskbar button.
-Gui, Add, Text,, Some text to display.
-Gui, Show, NoActivate, Title of Window  ; NoActivate avoids deactivating the currently active window.
-}
+ButtonOK:
+GuiClose:
+GuiEscape:
+Gui, Submit  ; Save each control's contents to its associated variable.
+MsgBox You entered:`n%MyCheckbox%`n%MyRadio%`n%MyEdit%
+ExitApp
 
 ^`:: ; Re-open this AHK script
 	Run, %A_ScriptFullPath%
 	ExitApp
 
-^!+1::
-GUI1()
+^!+3::
+gosub gui
 return

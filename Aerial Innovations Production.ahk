@@ -19,19 +19,15 @@ Script Function	---
 	#include Library\WinGetAll.ahk
 	#include Config\AIGlobalVariables.ahk
 	
-	user1 := "Meredith"
-	user2 := "Shawn"
-	pc1 := "WS01"
-	pc2 := "WS02"
-	
 	InitializeVariables()
 	Return
 InitializeVariables() {
 	global
 	Defaults(True)
 	AIguiStart()
-	gosub Backups
-	TitleblockFolderGroup()
+	;~ MsgBox ,,,Left: %MonLeft% -- Top: %MonTop% -- Right: %MonRight% -- Bottom %MonBottom%
+	;~ gosub Backups
+	;~ TitleblockFolderGroup()
 
 	;~ MsgBox, ,Startup Complete, Startup Complete
 }
@@ -40,10 +36,10 @@ InitializeVariables() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Run Functions and Timed Events
 ; GUI
-AIguiStart(){ ; Load GUI for user, workstation, and flight date variable capture
+AIGuiStart(){ ; Load GUI for user, workstation, and flight date variable capture
 	global
-	If WinName =
-		WinGetActiveTitle, WinName
+	;~ If WinName =
+		;~ WinGetActiveTitle, WinName
 	Gui, AIProdConfig: New, +AlwaysOnTop +DPIScale -SysMenu, Aerial Innovations Settings
 	Gui, Add, Text, x10 y10, Select user:
 	Gui, Add, DropDownList, x10 y30 w200 Choose1 vUserChoice, %user1%|%user2%
@@ -54,10 +50,31 @@ AIguiStart(){ ; Load GUI for user, workstation, and flight date variable capture
 	Gui, Add, Button, gButtonCancel x10 y160 w50, Close
 	Gui, Add, Button, gButtonOK Default x160 y160 w50, OK
 	Gui, Show
-	return
 }
-AIhudStart(){ ; Load GUI HUD that displays currently active user variables
-Gui, +E0x20 +AlwaysOnTop +Disabled -SysMenu +Owner
+AIHudStart(){ ; Load GUI HUD that displays currently active user variables
+	global
+	CustomColor = 000000  ; Can be any RGB color (it will be made transparent below).
+	Gui, AIProdHUD: New, +E0x20 +LastFound +AlwaysOnTop -Caption +ToolWindow -SysMenu +Owner +Disabled,AIProdHUD
+	;~ Gui +E0x20 +LastFound +AlwaysOnTop -Caption +ToolWindow  ; +ToolWindow avoids a taskbar button and an alt-tab menu item.
+	Gui, Color, %CustomColor%
+	Gui, Font, s12 wBold Q5  ; Set a large font size (32-point).
+	Gui, Add, Text, vHUDrow1 cWhite x0 y0, XXXXX XXXXX XXXXX XXXXX XXXXX XXXXX XXXXXX
+	Gui, Add, Text, vHUDrow2 cWhite x0 y20, XXXXX XXXXX XXXXX XXXXX XXXXX XXXXX XXXXXX
+	WinSet, TransColor, %CustomColor% ; Make all pixels of this color transparent and make the text itself translucent (150)
+	AIHudUpdate()	
+	Gui, Show, x0 y%GUIHUDposY% NoActivate  ; NoActivate avoids deactivating the currently active window.
+}
+AIHudUpdate() {
+	global
+	if (TBFilenamePrefix = "" and PsFileNumberSuffix = "")
+		GuiControl, AIProdHUD: Text, HUDrow1, %YYMMDD%
+	else if (PsFileNumberSuffix = "")
+		GuiControl, AIProdHUD: Text, HUDrow1, %TBFilenamePrefix% %YYMMDD%
+	else if (TBFilenamePrefix = "")
+		GuiControl, AIProdHUD: Text, HUDrow1, %YYMMDD%D%PsFileNumberSuffix%
+	else
+		GuiControl, AIProdHUD: Text, HUDrow1, %TBFilenamePrefix% %YYMMDD%D%PsFileNumberSuffix%
+	GuiControl, AIProdHUD: Text, HUDrow2, %userName% on %WorkstationName% (Alt+/)
 }
 SetUserVariables(AIUser) { ; switch that sets user variables from the GUI
 	global
@@ -95,7 +112,7 @@ SetWorkStationVariables(Workstation) { ; switch that sets work station variables
 		Hightail := "C:\Program Files (x86)\Hightail\Express\Hightail.exe"
 		Bridge := "C:\Program Files\Adobe\Adobe Bridge CC (64 Bit)\Bridge.exe"
 		Photoshop := "C:\Program Files\Adobe\Adobe Photoshop CC 2015\Photoshop.exe"
-		folderDesktopTemp := "C:\Users\WS2\Desktop\Temp\"
+		folderDesktopTemp := "C:\Users\WS2\Desktop\Temp"
 		WorkstationName := "WS02"
 		return local Workstation
 	}
@@ -133,17 +150,16 @@ ButtonOK:
 			)
 		IfMsgBox TryAgain
 			AIguiStart()
-		IfMsgBox Cancel
+		else IfMsgBox Cancel
 			Exit
 		}
-		MsgBox, ,Startup Complete, Startup Complete
-			;~ IfMsgBox OK {
-				;~ Exit
-				;~ SetTitleMatchMode Fast
-				;~ SetTitleMatchMode 1
-				;~ WinActivate, %WinName%
-				;~ WinName := ""
+		else {
+			SetTitleMatchMode Fast
+			SetTitleMatchMode 1
+			;~ WinActivate, %WinName%
+			;~ WinName := ""
 		}
+	AIHudStart()
 	return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
@@ -163,6 +179,7 @@ TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, a
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
 	FileList := ""
+	MsgBox, ,Startup Complete, Startup Complete
 }
 ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for debugging
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
@@ -413,10 +430,10 @@ $!n:: ; New large Main Browser Window resets workspace
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
-	;~ MsgBox, ,pswindow name captured, %PsWinTitle%
 	GoSub WaitXL
 	Send {F2}
 	GoSub WaitXXL
+	AIHudUpdate()
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	Send !w1
@@ -472,6 +489,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	TBFilenamePrefix := RegExReplace(WinName,regexPStabTB,"$1")
 	SendInput ^{Tab}
 	WinActivate
+	AIHudUpdate()
 	Defaults()
 	Return
 ^NumpadAdd:: ; Set active window as TB window similar to +F12
@@ -481,7 +499,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Gosub WaitS
 	WinGetActiveTitle, WinName
 	TBFilenamePrefix := RegExReplace(WinName,regexPStabTB,"$1")
-	MsgBox,,Titel Block Window, The TB Window is:`n%WinName%`n`nThe prefix is:`n%TBFilenamePrefix%
+	AIHudUpdate()
 	Return
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; General Shortcuts
@@ -542,19 +560,23 @@ $!n:: ; New large Main Browser Window resets workspace
 	Defaults()
 	return
 ^!d:: ; Draft title block email template
-	Send {space}Title Block Approval{Tab 4}
-	SendInput %emailSigTitleblockApproval%%userName%{Enter}
+	Send {space}Aerial Photos Title Block Approval{Tab 4}
+	SendInput %emailSigTitleblockApproval%-%userName%{Enter}
 	WinActivate, groupTB
 	return
 !NumpadDiv:: ; Input Flight Date variable
-	AIGuiStart()
-	Return
+	IfWinExist, AIProdConfig
+		WinActivate, AIProdConfig
+	else
+		AIGuiStart()
+	return
 ^NumpadSub:: ; List Variables
 	WinGetActiveTitle, PsWinTitleTB
 	TBReplaceCount :=
 	TBFilenamePrefix := RegExReplace(PsWinTitleTB, regexPStabTB,"$1",TBReplaceCount)
 	PsFilename := RegExReplace(PsWinTitle, RegExTabB,"$1$2$3")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle, regexOrigFilename,"$3")
+	AIHudUpdate()
 	ArrayPrint(userProdExplorer)
 	ListVars
 	Return
