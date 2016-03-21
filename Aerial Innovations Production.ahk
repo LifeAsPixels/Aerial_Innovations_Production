@@ -8,7 +8,7 @@ Script Function	---
 	This script allows for faster photo production at Aerial Innovations of GA.
 */
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;		Auto Execute Section, Default Variables, RegEx Variables
+;		Auto Execute Section
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	Menu, Tray, Icon, AerialInnovations.ico
 	#SingleInstance force ; Forces a single instance when trying to reopen script
@@ -18,18 +18,22 @@ Script Function	---
 	#include Library\Defaults.ahk
 	#include Library\WinGetAll.ahk
 	#include Config\AIGlobalVariables.ahk
-	
-	InitializeVariables()
-	Return
-InitializeVariables() {
-	global
 	Defaults(True)
 	AIguiStart()
-	;~ MsgBox ,,,Left: %MonLeft% -- Top: %MonTop% -- Right: %MonRight% -- Bottom %MonBottom%
+	return
+}
+PostGUIinitialization() {
+	AIHudStart()
+	; verify existence of all directory variables before attempting to use them
+	VariableDirectoryVerification(folderTitleBlocks)
+	VariableDirectoryVerification(folderArchivesTemp)
+	VariableDirectoryVerification(folderDesktopTemp)
+	VariableDirectoryVerification(userFolderNetworkDocuments)
+	VariableDirectoryVerification(userFolderNetworkBackups)
+	VariableDirectoryVerification(userFolderNetworkRecycle)
+	
+	TitleblockFolderGroup()
 	;~ gosub Backups
-	;~ TitleblockFolderGroup()
-
-	;~ MsgBox, ,Startup Complete, Startup Complete
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		GUI
@@ -159,11 +163,14 @@ ButtonOK:
 			;~ WinActivate, %WinName%
 			;~ WinName := ""
 		}
-	AIHudStart()
 	return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+VariableDirectoryVerification(Directory){
+	IfNotExist, %Directory%
+		FileCreateDir, %Directory%
+}
 TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, add them to window group
 	global
 	Filelist := ""
