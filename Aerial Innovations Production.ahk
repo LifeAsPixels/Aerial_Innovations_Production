@@ -21,7 +21,6 @@ Script Function	---
 	Defaults(True)
 	AIguiStart()
 	return
-}
 PostGUIinitialization() {
 	AIHudStart()
 	; verify existence of all directory variables before attempting to use them
@@ -31,16 +30,17 @@ PostGUIinitialization() {
 	VariableDirectoryVerification(userFolderNetworkDocuments)
 	VariableDirectoryVerification(userFolderNetworkBackups)
 	VariableDirectoryVerification(userFolderNetworkRecycle)
-	
+	;~ gosub ArchiveDriveWarning
 	TitleblockFolderGroup()
 	;~ gosub Backups
+	MsgBox, ,Startup Complete, Startup Complete
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;		GUI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Run Functions and Timed Events
 ; GUI
-AIGuiStart(){ ; Load GUI for user, workstation, and flight date variable capture
+AIGuiStart() { ; Load GUI for user, workstation, and flight date variable capture
 	global
 	;~ If WinName =
 		;~ WinGetActiveTitle, WinName
@@ -55,7 +55,7 @@ AIGuiStart(){ ; Load GUI for user, workstation, and flight date variable capture
 	Gui, Add, Button, gButtonOK Default x160 y160 w50, OK
 	Gui, Show
 }
-AIHudStart(){ ; Load GUI HUD that displays currently active user variables
+AIHudStart() { ; Load GUI HUD that displays currently active user variables
 	global
 	CustomColor = 000000  ; Can be any RGB color (it will be made transparent below).
 	Gui, AIProdHUD: New, +E0x20 +LastFound +AlwaysOnTop -Caption +ToolWindow -SysMenu +Owner +Disabled,AIProdHUD
@@ -83,17 +83,17 @@ AIHudUpdate() {
 SetUserVariables(AIUser) { ; switch that sets user variables from the GUI
 	global
 	if (AIUser = "Shawn") {
-		userFolderNetworkDocuments := "Z:\Shawn\Docs\"
-		userFolderNetworkBackups := "Z:\Shawn\Backups\"
-		userFolderNetworkRecycle := "Z:\Shawn\Backups\Recycle\"
-		userProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates", "Z:\Shawn\Aerial_Innovations_Production"]
+		userFolderNetworkDocuments := "Z:\Users\Shawn\Docs\"
+		userFolderNetworkBackups := "Z:\Users\Shawn\Backups\"
+		userFolderNetworkRecycle := "Z:\Users\Shawn\Backups\Recycle\"
+		userProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates", "Z:\Users\Shawn\Aerial_Innovations_Production"]
 		userName := "Shawn"
 		return local AIUser
 	}
 	else if (AIUser = "Meredith") {
-		userFolderNetworkDocuments := "Z:\Meredith\Docs\"
-		userFolderNetworkBackups := "Z:\Meredith\Backups\"
-		userFolderNetworkRecycle := "Z:\Meredith\Backups\Recycle\"
+		userFolderNetworkDocuments := "Z:\Users\Meredith\Docs\"
+		userFolderNetworkBackups := "Z:\Users\Meredith\Backups\"
+		userFolderNetworkRecycle := "Z:\Users\Meredith\Backups\Recycle\"
 		userProdExplorer := ["Y:\Email Folder", "Y:\CD Folder", "Z:\_Titleblock Templates"]
 		userName := "Meredith"
 		return local AIUser
@@ -155,13 +155,12 @@ ButtonOK:
 		IfMsgBox TryAgain
 			AIguiStart()
 		else IfMsgBox Cancel
-			Exit
-		}
-		else {
-			SetTitleMatchMode Fast
-			SetTitleMatchMode 1
-			;~ WinActivate, %WinName%
-			;~ WinName := ""
+			Exit	
+		;~ SetTitleMatchMode Fast
+		;~ SetTitleMatchMode 1
+		;~ WinActivate, %WinName%
+		;~ WinName := ""
+		PostGUIinitialization()
 		}
 	return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -171,7 +170,22 @@ VariableDirectoryVerification(Directory){
 	IfNotExist, %Directory%
 		FileCreateDir, %Directory%
 }
-TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, add them to window group
+FlightDateInput(FlightDateRaw) {
+	global
+	;~ InputBox, FlightDateRaw, Input Flight Date, Input date using format YYMMDD, , 320, 240
+	If (RegExMatch(FlightDateRaw, regexDate8Digit) = 1 or RegExMatch(FlightDateRaw, regexDate6Digit) = 1)
+	{
+		If RegExMatch(FlightDateRaw, regexDate8Digit) = 1
+			YYMMDD := Regexreplace(FlightDateRaw, regexDate8Digit, "$1")
+		If RegExMatch(FlightDateRaw, regexDate6Digit) = 1
+			YYMMDD := FlightDateRaw
+		YYYYMMDD := "20" . YYMMDD
+		return YYMMDD
+	}
+	Else
+		return false
+}
+TitleblockFolderGroup() { ; finds PSDs within folder, craete list of filenames, add them to window group
 	global
 	Filelist := ""
 	Loop , %folderTitleBlocks%*.psd, 0, 1
@@ -186,9 +200,8 @@ TitleblockFolderGroup(){ ; finds PSDs within folder, craete list of filenames, a
 	Loop, %folderTitleBlocks%*, 2, 0 
 		GroupAdd, groupTB, %A_LoopFileName%
 	FileList := ""
-	MsgBox, ,Startup Complete, Startup Complete
 }
-ArrayPrint(ArrayVar){ ; Print out the key and value pairs in an array. used for debugging
+ArrayPrint(ArrayVar) { ; Print out the key and value pairs in an array. used for debugging
 	Loop, % ArrayVar.MaxIndex() ;MaxIndex() will provide the maximum Key (note this will break when sparsely populated)
 	MsgBox,,Simple loop using "A_Index", % "Item: " A_Index " has the Value of: " ArrayVar[A_Index]
 }
@@ -200,7 +213,9 @@ PsBatch(SetNumber,ActionNumber,FromBridge = true) { ; Automatically Navigate the
 	else {
 		Send ^b
 	}
+	gosub WaitS
 	WinWaitActive ahk_class PSFloatC
+	gosub WaitS
 	Send {Tab}
 	Send {Up 7}{Down}{Up}
 	Send {Down %SetNumber%}
@@ -303,36 +318,18 @@ DateParse:
 	StringRight, DD, YYYYMMDD,2
 	
 	; If the month is June or July, do not abbreviate it anywhere.
-	If (MM = 06 or MM = 07)
-	{
+	If (MM = 06 or MM = 07)	{
 		FormatTime, MMMLower, 2015%MM%21, MMMM
 	}
-	else if (MM = 09)
-	{
+	else if (MM = 09) {
 		MMMLower := "SEPT"
 	}
-	else
-	{
+	else	{
 		FormatTime, MMMLower, 2015%MM%21, MMM
 	}
 	FormatTime, MMMM, 2015%MM%21, MMMM
 	StringUpper, MMM, MMMLower
 	Return
-FlightDateInput(FlightDateRaw) {
-	global
-	;~ InputBox, FlightDateRaw, Input Flight Date, Input date using format YYMMDD, , 320, 240
-	If (RegExMatch(FlightDateRaw, regexDate8Digit) = 1 or RegExMatch(FlightDateRaw, regexDate6Digit) = 1)
-	{
-		If RegExMatch(FlightDateRaw, regexDate8Digit) = 1
-			YYMMDD := Regexreplace(FlightDateRaw, regexDate8Digit, "$1")
-		If RegExMatch(FlightDateRaw, regexDate6Digit) = 1
-			YYMMDD := FlightDateRaw
-		YYYYMMDD := "20" . YYMMDD
-		return YYMMDD
-	}
-	Else
-		return false
-}
 FlightDateValidate:
 	If FlightDateRaw =
 		AIGuiStart()
@@ -371,6 +368,7 @@ WaitXXL:
 	return
 WaitXXXL:
 	Sleep 3000
+	return
 Backups:
 	gosub, BackupAppdata
 	return
@@ -378,21 +376,32 @@ BackupAppdata:
 	FormatTime, BackupDate, ,yyyyMMdd
 	For i, value in AppDataBackups
 	{
-		IfExist, %userFolderNetworkBackups%%BackupDate%%value%
+		IfExist,%userFolderNetworkBackups%%BackupDate%%value%
+			;~ MsgBox,,,%userFolderNetworkBackups%-%BackupDate%-%value%
 			continue
-		FileCopyDir, %A_Appdata%%value%, %userFolderNetworkBackups%%BackupDate%%value%, 1
+		MsgBox,,, %A_Appdata%%value%, %userFolderNetworkBackups%%BackupDate%%value%
+		FileCopy,%A_Appdata%%value%,%userFolderNetworkBackups%%BackupDate%%value%,1
 	}
 	; Delete all folders in the backups folder dated older than 31 days
 	CurrentTime := 
 	EnvAdd, CurrentTime,  -31, days
-	FormatTime, CurrentTime, %CurrentTime%, yyMMdd
+	;~ MsgBox,,,%CurrentTime%
+	FormatTime, CurrentTime, %CurrentTime%, yyyyMMdd
+	;~ MsgBox,,,%CurrentTime%
 	Loop, %userFolderNetworkBackups%*, 2, 0
 	{
-		If (A_LoopFileName < CurrentTime and RegExMatch(A_LoopFileName, regexDate6Digit))
+		;~ MsgBox,,, A_LoopFileName = %A_LoopFileName%`nCurrentTime = %CurrentTime%
+		;~ If (A_LoopFileName < CurrentTime and RegExMatch(A_LoopFileName, regexDate6Digit))
+		If (A_LoopFileName < CurrentTime)
 			FileRemoveDir, %A_LoopFileLongPath%, 1
 	}
 	; schedule "BackupAppdata" to run again tomorrow at the same time
 	SetTimer, Backups, 86400000
+	return
+ArchiveDriveWarning:
+	if (WorkstationName = "WS02" and (FileExist("V:\") = false or FileExist("U:\") = false)) {
+			MsgBox,,WARNING, Turn on the power strip for the archive drives, make sure they are on and working.
+	}
 	return
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Adobe Bridge Shortcuts
@@ -437,16 +446,15 @@ $!n:: ; New large Main Browser Window resets workspace
 	WinGetActiveTitle, PsWinTitle
 	PsFilename := RegExReplace(PsWinTitle,regexOrigFilename,"$1$2$3$4$6$7$8")
 	PsFileNumberSuffix := RegExReplace(PsWinTitle,regexOrigFilename,"$3$7")
-	GoSub WaitXL
 	Send {F2}
-	GoSub WaitXXL
+	GoSub WaitL
 	AIHudUpdate()
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	Send !w1
 	GoSub WaitS
 	Send ^+{tab}
-	GoSub WaitXL
+	GoSub WaitL
 	Send +{F2}
 	GoSub WaitS
 	Send ^t
@@ -509,15 +517,9 @@ $!n:: ; New large Main Browser Window resets workspace
 	AIHudUpdate()
 	Return
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-; General Shortcuts
+; When Lightroom isn't active
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-#IfWinActive
-^`:: ; Re-open this AHK script
-	Run, %A_ScriptFullPath%
-	ExitApp
-^+`::
-	Defaults()
-	Return
+#IfWinNotActive, Lightroom
 ^+e:: ; set explorer working space for production
 	SetTitleMatchMode 3
 	Loop
@@ -544,7 +546,16 @@ $!n:: ; New large Main Browser Window resets workspace
 	RunProgram("Asana", Asana)
 	Defaults()
 	return
-	
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; General Shortcuts
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#IfWinActive
+^`:: ; Re-open this AHK script
+	Run, %A_ScriptFullPath%
+	ExitApp
+^+`::
+	Defaults()
+	Return	
 ^+a:: ; Send email signature with variable date based on the flight date
 	GoSub FlightDateValidate
 	GoSub BlockAllInput
@@ -567,7 +578,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	Defaults()
 	return
 ^!d:: ; Draft title block email template
-	Send {space}Aerial Photos Title Block Approval{Tab 4}
+	Send {End}Aerial Photos Title Block Approval{Tab 4}
 	SendInput %emailSigTitleblockApproval%-%userName%{Enter}
 	WinActivate, groupTB
 	return
@@ -623,6 +634,7 @@ $!n:: ; New large Main Browser Window resets workspace
 	
 ^!+F1:: ; Most all files from curerntly selected folders into %folderArchives% then moves the folder to a temp backup location
 	 ; Declare/Clear variables used in this function
+	VariableDirectoryVerification(folderArchivesTemp)
 	FolderPath := Array()
 	For i, value in FolderPath
 		FolderPath.Remove(i)
