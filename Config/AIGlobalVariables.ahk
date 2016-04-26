@@ -1,3 +1,5 @@
+SysGet, Mon1, Monitor
+GUIHUDposY := Mon1Bottom-100
 ; RegEx Variables
 regexOrigFilename := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})(.+)|(0{0,4})(\d{1,5})(.+\.[\w]{1,4})(.+)$"
 regexOrigFileNoPSextension := "i)^(_MG_?|DSC_?|APP_|.+? \d{6}D)(0{0,4})(\d{1,5})(\.\w{1,4})|(\d{1,5}).+\.[\w]{1,4}$"
@@ -10,6 +12,10 @@ regexRemovePSD := "^(.+?)\.psd$"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; File Patterns
 BackupFilePattern := "\*.*"
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Folders
+folderArchivesTemp := "Z:\Archives\Temp\"
+folderTitleBlocks := "Z:\_Titleblock Templates\"
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ; Window Groups
 GroupAdd, Photoshop, ahk_class Photoshop
@@ -26,5 +32,16 @@ Asana := "https://app.asana.com"
 ; Local Arrays
 AppDataBackups := ["\Adobe\Adobe Photoshop CC 2014\Adobe Photoshop CC 2014 Settings", "\Adobe\Bridge CC\Workspaces", "\Adobe\Bridge CC\Favorite Alias", "\Adobe\Bridge CC\Collections", "\Adobe\Bridge CC\Batch Rename Settings", "\Adobe\Bridge CC\Adobe Output Module"]
 
-; Folders
-folderArchivesTemp := "Z:\Archives\Temp"
+user1 := "Meredith"
+user2 := "Shawn"
+pc1 := "WS01"
+pc2 := "WS02"
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+; Email messages
+
+emailSigAerialPhotos = Thank you. Have a wonderful day{!}{Enter}-{Space}
+emailSigTitleblockApproval = The draft title block for this project is attached. Please let us know if this looks good or if any changes need to be made.{Enter}Thanks{!}{Enter}Aerial Innovations{Enter}
+
+;~ emailSigProgressEnding := "I was looking at the aerial photo order for this job and saw that it may be ending soon. Do you have an update for us in regards to how much longer you need it photographed?"
+;~ emailSigAerialPhotos := "Thank you. Have a wonderful day!"{!}{Enter}-{Space}
+;~ emailSigTitleblockApproval := "The draft title block for this project is attached. Please let us know if this looks good or if any changes need to be made."{Enter}Thanks{!}{Enter}
