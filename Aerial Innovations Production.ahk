@@ -183,12 +183,13 @@ Wait(WS01 = 500, WS02 = 250, WS03 = 250) { ; switch for wait times depending on 
 		sleep 40
 }
 PsCaptureWindowSafely() { ;tab forward and back to ensure proper window is active in PS
+	ReleaseKeys()
 	Send ^{Tab}
 	ReleaseKeys()
-	Wait(1000,250,250)
+	Wait(500,250,250)
 	Send ^+{Tab}
 	ReleaseKeys()
-	Wait(4000,500,250)
+	Wait(6000,500,250)
 }
 PostGUIinitialization() {
 	AIHudStart()
@@ -350,6 +351,7 @@ BlockAllInput:
 	CoordMode, Mouse, Screen
 	MouseGetPos, MouseX, MouseY
 	MouseMove, 10000, 510
+	ReleaseKeys()
 	Return
 DateParse:
 	StringMid, YYYY, YYYYMMDD,1,4
@@ -492,14 +494,14 @@ $!n:: ; New large Main Browser Window resets workspace
 	SetTitleMatchMode Fast
 	SetTitleMatchMode 2
 	Send !w1
-	Wait(3000,500,250)
-	;~ ReleaseKeys()
+	Wait(500,500,250)
+	ReleaseKeys()
 	Send ^+{tab}
-	Wait(3000,1500,250)
+	Wait(6000,1500,250)
 	ReleaseKeys()
 	Send +{F2}
 	Wait(1500,500,250)
-	;~ ReleaseKeys()
+	ReleaseKeys()
 	Send ^t
 	Send ^0
 	Defaults(True)
